@@ -20,6 +20,8 @@
 		E040634119E549ED00C0A3D0 /* Observer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040633619E549ED00C0A3D0 /* Observer.swift */; };
 		E040634519E54A0A00C0A3D0 /* IndoorLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040634319E54A0A00C0A3D0 /* IndoorLocalizationTests.swift */; };
 		E040634619E54A0A00C0A3D0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E040634419E54A0A00C0A3D0 /* Info.plist */; };
+		E040635119E70AB000C0A3D0 /* BeaconDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */; };
+		E040635319E7B32000C0A3D0 /* BeaconRangingChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +71,8 @@
 		E040633619E549ED00C0A3D0 /* Observer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Observer.swift; sourceTree = "<group>"; };
 		E040634319E54A0A00C0A3D0 /* IndoorLocalizationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndoorLocalizationTests.swift; sourceTree = "<group>"; };
 		E040634419E54A0A00C0A3D0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconDetailsViewController.swift; sourceTree = "<group>"; };
+		E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconRangingChartViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +130,8 @@
 			isa = PBXGroup;
 			children = (
 				E040632E19E549ED00C0A3D0 /* BeaconViewController.swift */,
+				E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */,
+				E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */,
 			);
 			path = controllers;
 			sourceTree = "<group>";
@@ -281,12 +287,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E040635319E7B32000C0A3D0 /* BeaconRangingChartViewController.swift in Sources */,
 				E040633E19E549ED00C0A3D0 /* BeaconLogManager.swift in Sources */,
 				E040634119E549ED00C0A3D0 /* Observer.swift in Sources */,
 				E040634019E549ED00C0A3D0 /* Observable.swift in Sources */,
 				E040633F19E549ED00C0A3D0 /* BeaconModel.swift in Sources */,
 				E040633B19E549ED00C0A3D0 /* BeaconViewController.swift in Sources */,
 				E040633819E549ED00C0A3D0 /* AppDelegate.swift in Sources */,
+				E040635119E70AB000C0A3D0 /* BeaconDetailsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,6 +503,7 @@
 				E040630D19E3BC8B00C0A3D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E040630E19E3BC8B00C0A3D0 /* Build configuration list for PBXNativeTarget "BeaconRadioTests" */ = {
 			isa = XCConfigurationList;
@@ -503,6 +512,7 @@
 				E040631019E3BC8B00C0A3D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

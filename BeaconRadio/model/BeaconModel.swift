@@ -76,14 +76,14 @@ class BeaconModel: NSObject, CLLocationManagerDelegate, Observable {
     // MARK: CLLocationManagerDelegate
     
     func locationManager(manager: CLLocationManager!, didRangeBeacons beacons: [AnyObject]!, inRegion region: CLBeaconRegion!) {
-        println("# Beacons in region '\(region.identifier)'")
+        //println("# Beacons in region '\(region.identifier)'")
         
         for beacon in beacons {
             if beacon is CLBeacon {
                 logManager.addLogEntry(beacon as CLBeacon)
                 notifyObservers()
                 
-                println("  - Major: \(beacon.major), Minor: \(beacon.minor), RSSI: \(beacon.rssi), Accuracy: \(beacon.accuracy), Proximity: \(beacon.proximity.toRaw())")
+                //println("  - Major: \(beacon.major), Minor: \(beacon.minor), RSSI: \(beacon.rssi), Accuracy: \(beacon.accuracy), Proximity: \(beacon.proximity.toRaw())")
             }
         }
     }
