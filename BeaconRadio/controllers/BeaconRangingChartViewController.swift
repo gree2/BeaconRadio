@@ -11,14 +11,19 @@ import UIKit
 
 class BeaconRangingChartViewController: UIViewController, Observer {
     
+    var beaconID: BeaconID?
+    private var rssiChart: NCISimpleChartView?
+    private var accuracyChart: NCISimpleChartView?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setup()
+        
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         // register observer
+        setup()
         BeaconModel.sharedInstance.addObserver(self)
     }
     
@@ -34,11 +39,88 @@ class BeaconRangingChartViewController: UIViewController, Observer {
     
     private func setup() {
         
+        let rssiChartOptions = [
+            nciIsSmooth: [true],
+            nciIsFill: [false],
+            nciHasSelection: false,
+            nciGridTopMargin: 20,
+            nciGridBottomMargin: 20,
+            nciGridLeftMargin: 50,
+            nciGridRightMargin: 50,
+            nciLineWidths:[1],
+            nciLineColors: [UIColor.blueColor()],
+            nciYAxis: [
+                nciAxisShift: 0,
+                nciInvertedLabes: false,
+                nciLineWidth: 2,
+                nciLineDashes: [],
+                nciLineColor: UIColor.blueColor(),
+                nciLabelsColor: UIColor.blueColor()
+            ],
+            nciXAxis: [
+                nciLineWidth: 2,
+                nciAxisShift : self.view.frame.size.height-40,
+                nciInvertedLabes: false,
+                nciLineDashes: []
+        ]]
+        
+        let accuracyChartOptions = [
+            nciIsSmooth: [true],
+            nciIsFill: [false],
+            nciHasSelection: false,
+            nciGridTopMargin: 20,
+            nciGridBottomMargin: 20,
+            nciGridLeftMargin: 50,
+            nciGridRightMargin: 50,
+            nciLineWidths:[1],
+            nciLineColors: [UIColor.redColor()],
+            nciYAxis: [
+                nciAxisShift: self.view.frame.size.width-100,
+                nciInvertedLabes: true,
+                nciLineWidth: 2,
+                nciLineDashes: [],
+                nciLineColor: UIColor.redColor(),
+                nciLabelsColor: UIColor.redColor()
+            ],
+            nciXAxis: [
+                nciLineWidth: 2,
+                nciAxisShift : self.view.frame.size.height-40,
+                nciInvertedLabes: false,
+                nciLineDashes: [] // required (bug in chart view, otherwise the chart's line will be dashed)
+        ]]
+        
+        if self.rssiChart == nil {
+            self.rssiChart = NCISimpleChartView(frame: CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height), andOptions: rssiChartOptions)
+            self.view.addSubview(self.rssiChart!)
+        }
+        
+        if self.accuracyChart == nil {
+            self.accuracyChart = NCISimpleChartView(frame: CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height), andOptions: accuracyChartOptions)
+            self.view.addSubview(self.accuracyChart!)
+        }
+        
         update()
     }
     
     // MARK: Observer protocol
     func update() {
-        // TODO
+
+        if let beacon = self.beaconID {
+
+            let logEntries = BeaconModel.sharedInstance.getLogEntriesForBeacon(beacon)
+            
+            rssiChart?.chartData.removeAllObjects()
+            accuracyChart?.chartData.removeAllObjects()
+            
+            var i = 0
+            for logEntry in logEntries {
+                rssiChart?.addPoint(Double(i), val: [Double(logEntry.rssi)])
+                accuracyChart?.addPoint(Double(i), val: [logEntry.accuracy])
+                ++i
+            }
+            
+            rssiChart?.drawChart()
+            accuracyChart?.drawChart()
+        }
     }
 }

@@ -55,6 +55,7 @@ class BeaconLogManager {
 
     
     private var beacons = Dictionary<String, BeaconLog>()
+    let logCapacity = 60 // per beacon
     
     init() {
         
@@ -64,12 +65,20 @@ class BeaconLogManager {
         let bID = BeaconID(proximityUUID: beacon.proximityUUID, major: beacon.major, minor: beacon.minor)
         let logEntry = LogEntry(proximity: beacon.proximity, accuracy: beacon.accuracy, rssi: beacon.rssi)
         
-        if ((self.beacons[bID.description()]) != nil) {
+        let bIDDescription = bID.description()
+        
+        if ((self.beacons[bIDDescription]) != nil) {
             // beacon does already exist in log --> add log entry
-            self.beacons[bID.description()]?.log.append(logEntry)
+            
+            if self.beacons[bIDDescription]?.log.count >= logCapacity {
+                self.beacons[bIDDescription]?.log.removeAtIndex(0)
+            }
+            self.beacons[bIDDescription]?.log.append(logEntry)
+            
         } else {
             // beacon does not exist in log --> add new beacon
-            self.beacons[bID.description()] = BeaconLog(id: bID, log: [logEntry])
+            self.beacons[bIDDescription] = BeaconLog(id: bID, log: [logEntry])
+            self.beacons[bIDDescription]?.log.reserveCapacity(logCapacity)
         }
     }
     
@@ -89,5 +98,14 @@ class BeaconLogManager {
             return bLog.log.last
         }
         return nil
+    }
+    
+    func getLogEntriesForBeacon(beacon: BeaconID) -> [LogEntry] {
+        let id = beacon.description()
+        
+        if let bLog = self.beacons[id] {
+            return bLog.log
+        }
+        return []
     }
 }

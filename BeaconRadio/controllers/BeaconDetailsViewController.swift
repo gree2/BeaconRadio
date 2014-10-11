@@ -11,6 +11,13 @@ import UIKit
 
 class BeaconDetailsViewController: UIViewController, Observer {
     
+    @IBOutlet weak var uuidLabel: UILabel!
+    @IBOutlet weak var majorLabel: UILabel!
+    @IBOutlet weak var minorLabel: UILabel!
+    @IBOutlet weak var proximityLabel: UILabel!
+    @IBOutlet weak var rssiLabel: UILabel!
+    @IBOutlet weak var accuracyLabel: UILabel!
+    
     var beaconID: BeaconID?
     
     override func viewDidLoad() {
@@ -34,25 +41,27 @@ class BeaconDetailsViewController: UIViewController, Observer {
         super.didReceiveMemoryWarning()
     }
     
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        if segue.identifier == "BeaconRangingChart" {
+            let chartViewController = segue.destinationViewController as BeaconRangingChartViewController
+            chartViewController.beaconID = self.beaconID
+        }
+    }
     
     // MARK: Observer protocol
     func update() {
-        let uuid = view.viewWithTag(1) as UILabel
-        let major = view.viewWithTag(3) as UILabel
-        let minor = view.viewWithTag(5) as UILabel
-        let rssi = view.viewWithTag(7) as UILabel
-        let accuracy = view.viewWithTag(9) as UILabel
-        let proximity = view.viewWithTag(11) as UILabel
+
         
         if let bID = self.beaconID {
-            uuid.text = bID.proximityUUID.UUIDString
-            major.text = "\(bID.major)"
-            minor.text = "\(bID.minor)"
+            uuidLabel.text = bID.proximityUUID.UUIDString
+            majorLabel.text = "\(bID.major)"
+            minorLabel.text = "\(bID.minor)"
             
             if let log = BeaconModel.sharedInstance.getActualLogEntryForBeacon(bID) {
-                rssi.text = "\(log.rssi)"
-                accuracy.text = "\(Double(Int(log.accuracy*100))/100.0)"
-                proximity.text = log.proximity.description()
+                rssiLabel.text = "\(log.rssi) db"
+                accuracyLabel.text = "\(Double(Int(log.accuracy*100))/100.0) m"
+                proximityLabel.text = log.proximity.description()
             }
         }
         

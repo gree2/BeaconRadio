@@ -22,6 +22,7 @@
 		E040634619E54A0A00C0A3D0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E040634419E54A0A00C0A3D0 /* Info.plist */; };
 		E040635119E70AB000C0A3D0 /* BeaconDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */; };
 		E040635319E7B32000C0A3D0 /* BeaconRangingChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */; };
+		FAA8A0DDB4263D024491547F /* libPods-BeaconRadio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 096DBBE9DC6CC1E4D7CE2CE3 /* libPods-BeaconRadio.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		096DBBE9DC6CC1E4D7CE2CE3 /* libPods-BeaconRadio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BeaconRadio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		95ABF6B9C87707F0FF76C6C5 /* Pods-BeaconRadio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BeaconRadio.release.xcconfig"; path = "Pods/Target Support Files/Pods-BeaconRadio/Pods-BeaconRadio.release.xcconfig"; sourceTree = "<group>"; };
+		980E73A51563FD00165D0F1B /* Pods-BeaconRadio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BeaconRadio.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BeaconRadio/Pods-BeaconRadio.debug.xcconfig"; sourceTree = "<group>"; };
 		E04062EA19E3BC8B00C0A3D0 /* BeaconRadio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeaconRadio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E040630119E3BC8B00C0A3D0 /* BeaconRadioTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeaconRadioTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E040631119E3BCD900C0A3D0 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -73,6 +77,7 @@
 		E040634419E54A0A00C0A3D0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconDetailsViewController.swift; sourceTree = "<group>"; };
 		E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconRangingChartViewController.swift; sourceTree = "<group>"; };
+		E040635419E7C17C00C0A3D0 /* BeaconRadio-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BeaconRadio-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +86,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E040631219E3BCD900C0A3D0 /* CoreLocation.framework in Frameworks */,
+				FAA8A0DDB4263D024491547F /* libPods-BeaconRadio.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +100,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		67123D1858AE6BF022438A2B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				096DBBE9DC6CC1E4D7CE2CE3 /* libPods-BeaconRadio.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CFD50916D7B7C6708694F17B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				980E73A51563FD00165D0F1B /* Pods-BeaconRadio.debug.xcconfig */,
+				95ABF6B9C87707F0FF76C6C5 /* Pods-BeaconRadio.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		E04062E119E3BC8B00C0A3D0 = {
 			isa = PBXGroup;
 			children = (
@@ -101,6 +124,8 @@
 				E040634219E54A0A00C0A3D0 /* BeaconRadioTests */,
 				E040631119E3BCD900C0A3D0 /* CoreLocation.framework */,
 				E04062EB19E3BC8B00C0A3D0 /* Products */,
+				CFD50916D7B7C6708694F17B /* Pods */,
+				67123D1858AE6BF022438A2B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -122,6 +147,7 @@
 				E040633119E549ED00C0A3D0 /* model */,
 				E040633419E549ED00C0A3D0 /* util */,
 				E040634D19E58DB200C0A3D0 /* Supporting Files */,
+				E040635419E7C17C00C0A3D0 /* BeaconRadio-Bridging-Header.h */,
 			);
 			path = BeaconRadio;
 			sourceTree = "<group>";
@@ -139,8 +165,8 @@
 		E040633119E549ED00C0A3D0 /* model */ = {
 			isa = PBXGroup;
 			children = (
-				E040633219E549ED00C0A3D0 /* BeaconLogManager.swift */,
 				E040633319E549ED00C0A3D0 /* BeaconModel.swift */,
+				E040633219E549ED00C0A3D0 /* BeaconLogManager.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -188,9 +214,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E040630B19E3BC8B00C0A3D0 /* Build configuration list for PBXNativeTarget "BeaconRadio" */;
 			buildPhases = (
+				26F369B6BF42B64038CCAFC0 /* Check Pods Manifest.lock */,
 				E04062E619E3BC8B00C0A3D0 /* Sources */,
 				E04062E719E3BC8B00C0A3D0 /* Frameworks */,
 				E04062E819E3BC8B00C0A3D0 /* Resources */,
+				6BBED8000654E5561174CDD3 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -281,6 +309,39 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		26F369B6BF42B64038CCAFC0 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		6BBED8000654E5561174CDD3 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BeaconRadio/Pods-BeaconRadio-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E04062E619E3BC8B00C0A3D0 /* Sources */ = {
@@ -430,23 +491,30 @@
 		};
 		E040630C19E3BC8B00C0A3D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 980E73A51563FD00165D0F1B /* Pods-BeaconRadio.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "$(SRCROOT)/BeaconRadio/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = BeaconRadio;
+				SWIFT_OBJC_BRIDGING_HEADER = "BeaconRadio/BeaconRadio-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		E040630D19E3BC8B00C0A3D0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 95ABF6B9C87707F0FF76C6C5 /* Pods-BeaconRadio.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "$(SRCROOT)/BeaconRadio/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = BeaconRadio;
+				SWIFT_OBJC_BRIDGING_HEADER = "BeaconRadio/BeaconRadio-Bridging-Header.h";
 			};
 			name = Release;
 		};

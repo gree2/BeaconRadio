@@ -1,0 +1,10 @@
+PODS:
+  - NCICharts (2.0.1)
+
+DEPENDENCIES:
+  - NCICharts
+
+SPEC CHECKSUMS:
+  NCICharts: 4d203189de31450f20cebfc3f4dfbc08a2321338
+
+COCOAPODS: 0.34.1

@@ -72,6 +72,10 @@ class BeaconModel: NSObject, CLLocationManagerDelegate, Observable {
         return logManager.getActualLogEntryForBeacon(beacon)
     }
     
+    func getLogEntriesForBeacon(beacon: BeaconID) -> [LogEntry] {
+        return logManager.getLogEntriesForBeacon(beacon)
+    }
+    
     
     // MARK: CLLocationManagerDelegate
     
