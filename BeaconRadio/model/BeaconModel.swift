@@ -55,12 +55,12 @@ class BeaconModel: NSObject, CLLocationManagerDelegate, Observable {
     }
     
     private func isAuthorized()->Bool {
-        return CLLocationManager.authorizationStatus() == CLAuthorizationStatus.Authorized
+        return CLLocationManager.authorizationStatus() == CLAuthorizationStatus.AuthorizedWhenInUse
     }
     
     private func askForAuthorization() {
         if CLLocationManager.authorizationStatus() == CLAuthorizationStatus.NotDetermined {
-            self.locationManager?.requestAlwaysAuthorization()
+            self.locationManager?.requestWhenInUseAuthorization()
         }
     }
     
