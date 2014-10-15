@@ -93,7 +93,7 @@ class BeaconLogManager {
     func clearLog() {
         self.beacons.removeAll(keepCapacity: false)
     }
-    
+        
     func getBeacons() -> [BeaconID] {
         var result = [BeaconID]()
         
@@ -119,5 +119,40 @@ class BeaconLogManager {
             return bLog.log
         }
         return []
+    }
+    
+    func save2File(filename: String) {
+        
+        let dirs : [String]? = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true) as? [String]
+
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "HH:mm:ss"
+        
+        
+        if let directories = dirs {
+            let dir = directories[0]; //documents directory
+            let path = dir.stringByAppendingPathComponent(filename);
+            var content:String = ""
+            
+            for key in self.beacons.keys {
+                
+                let beaconLog = self.beacons[key]!
+                
+                content += "# \(beaconLog.id.description())\n"
+                content += "timestamp | rssi (db) | accuracy (m) | proximity\n"
+                
+                for logEntry in beaconLog.log {
+                    content += "\(dateFormatter.stringFromDate(logEntry.timestamp))|\(logEntry.rssi!)|\(logEntry.accuracy!)|\(logEntry.proximity.description())\n"
+                }
+            }
+            
+            
+            //writing
+            content.writeToFile(path, atomically: false, encoding: NSUTF8StringEncoding, error: nil);
+        }
+    }
+    
+    func countLogEntriesForBeacon(beacon: BeaconID) -> Int? {
+        return self.beacons[beacon.description()]?.log.count
     }
 }
