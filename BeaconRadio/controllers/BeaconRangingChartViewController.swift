@@ -8,10 +8,15 @@
 
 import Foundation
 import UIKit
+import CoreLocation
 
 class BeaconRangingChartViewController: UIViewController, Observer {
     
-    var beaconID: BeaconID?
+    var beacon: CLBeacon?
+    private var beaconID: BeaconID?
+    
+    private let beaconLog = BeaconLogManager(capacity: 30)
+    
     private var rssiChart: NCISimpleChartView?
     private var accuracyChart: NCISimpleChartView?
     
@@ -23,14 +28,19 @@ class BeaconRangingChartViewController: UIViewController, Observer {
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         // register observer
+        
+        if let b = self.beacon {
+            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major, minor: b.minor)
+        }
+        
         setup()
-        BeaconModel.sharedInstance.addObserver(self)
+        BeaconRadar.sharedInstance.addObserver(self)
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         // unregister observer
-        BeaconModel.sharedInstance.removeObserver(self)
+        BeaconRadar.sharedInstance.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -40,7 +50,7 @@ class BeaconRangingChartViewController: UIViewController, Observer {
     private func setup() {
         
         let rssiChartOptions = [
-            nciIsSmooth: [true],
+            nciIsSmooth: [false],
             nciIsFill: [false],
             nciHasSelection: false,
             nciGridTopMargin: 20,
@@ -65,7 +75,7 @@ class BeaconRangingChartViewController: UIViewController, Observer {
         ]]
         
         let accuracyChartOptions = [
-            nciIsSmooth: [true],
+            nciIsSmooth: [false],
             nciIsFill: [false],
             nciHasSelection: false,
             nciGridTopMargin: 20,
@@ -105,17 +115,21 @@ class BeaconRangingChartViewController: UIViewController, Observer {
     // MARK: Observer protocol
     func update() {
 
-        if let beacon = self.beaconID {
+        if let beacon = self.beacon {
 
-            let logEntries = BeaconModel.sharedInstance.getLogEntriesForBeacon(beacon)
+            self.beacon = BeaconRadar.sharedInstance.getBeacon(self.beaconID!)
+            
+            if self.beacon != nil && self.beacon?.proximity != CLProximity.Unknown {
+                self.beaconLog.addLogEntry(self.beacon!)
+            }
             
             rssiChart?.chartData.removeAllObjects()
             accuracyChart?.chartData.removeAllObjects()
             
             var i = 0
-            for logEntry in logEntries {
-                rssiChart?.addPoint(Double(i), val: [Double(logEntry.rssi)])
-                accuracyChart?.addPoint(Double(i), val: [logEntry.accuracy])
+            for logEntry in self.beaconLog.getLogEntriesForBeacon(self.beaconID!) {
+                rssiChart?.addPoint(Double(i), val: [Double(logEntry.rssi!)])
+                accuracyChart?.addPoint(Double(i), val: [logEntry.accuracy!])
                 ++i
             }
             

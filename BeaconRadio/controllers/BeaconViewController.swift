@@ -11,7 +11,7 @@ import UIKit
 
 class BeaconViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, Observer {
     
-    private var beacons = BeaconModel.sharedInstance.getBeacons()
+    private var beacons = BeaconRadar.sharedInstance.getBeacons()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,13 +20,13 @@ class BeaconViewController: UITableViewController, UITableViewDelegate, UITableV
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         // register observer
-        BeaconModel.sharedInstance.addObserver(self)
+        BeaconRadar.sharedInstance.addObserver(self)
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         // unregister observer
-        BeaconModel.sharedInstance.removeObserver(self)
+        BeaconRadar.sharedInstance.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -39,7 +39,7 @@ class BeaconViewController: UITableViewController, UITableViewDelegate, UITableV
             let detailsViewController = segue.destinationViewController as BeaconDetailsViewController
             
             if let indexPath = tableView.indexPathForSelectedRow() {
-                detailsViewController.beaconID = beacons[indexPath.row]
+                detailsViewController.beacon = self.beacons[indexPath.row]
             }
         }
     }
@@ -54,10 +54,6 @@ class BeaconViewController: UITableViewController, UITableViewDelegate, UITableV
     
     // MARK: UITableViewDatasource protocol
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        
-        // load new beacons
-        self.beacons = BeaconModel.sharedInstance.getBeacons()
-        
         return 1
     }
     
@@ -65,8 +61,8 @@ class BeaconViewController: UITableViewController, UITableViewDelegate, UITableV
         
         var title: String = ""
         
-        if let beaconID = beacons.first {
-            title = "UUID: " + beaconID.proximityUUID.UUIDString
+        if let beacon = self.beacons.first {
+            title = "UUID: " + beacon.proximityUUID.UUIDString
         }
         return title
     }
@@ -82,35 +78,28 @@ class BeaconViewController: UITableViewController, UITableViewDelegate, UITableV
         
         if indexPath.row < beacons.count {
             
+            let beacon = self.beacons[indexPath.row]
             
+            // labels
             let major = cell.contentView.viewWithTag(1) as UILabel
             let minor = cell.contentView.viewWithTag(3) as UILabel
             let rssi = cell.contentView.viewWithTag(5) as UILabel
             let accuracy = cell.contentView.viewWithTag(7) as UILabel
-            //let proximity = cell.contentView.viewWithTag(9) as UILabel
             
-            let beaconID = beacons[indexPath.row]
-            
-            major.text = "\(beaconID.major)"
-            minor.text = "\(beaconID.minor)"
-            
-            if let logEntry = BeaconModel.sharedInstance.getActualLogEntryForBeacon(beaconID) {
-                rssi.text = "\(logEntry.rssi)"
-                
-                let accuracyValue: Double = Double(Int(logEntry.accuracy*100))/100.0
-                accuracy.text = "\(accuracyValue)"
-                //proximity.text = logEntry.proximity.description()
-            }
-            
-            
+            // set labels
+            major.text = "\(beacon.major)"
+            minor.text = "\(beacon.minor)"
+            rssi.text = "\(beacon.rssi)"
+            accuracy.text = "\(Double(Int(beacon.accuracy*100))/100.0)"
         }
         return cell
     }
     
     
     // MARK: Observer protocol
-    
     func update() {
+        
+        beacons = BeaconRadar.sharedInstance.getBeacons()
         self.tableView.reloadData()
     }
     

@@ -37,9 +37,10 @@ struct BeaconID {
 }
 
 struct LogEntry {
+    let timestamp: NSDate
     let proximity: CLProximity
-    let accuracy: Double
-    let rssi: Int
+    let accuracy: Double?
+    let rssi: Int?
     
     func description() -> String {
         return "RSSI: \(rssi), Accuracy: \(accuracy), proximity: \(proximity.description())"
@@ -55,22 +56,27 @@ class BeaconLogManager {
 
     
     private var beacons = Dictionary<String, BeaconLog>()
-    let logCapacity = 60 // per beacon
+    let logCapacity: Int?// per beacon
     
     init() {
         
     }
     
+    init(capacity: Int) {
+        self.logCapacity = capacity
+    }
+    
     func addLogEntry(beacon: CLBeacon) {
+        
         let bID = BeaconID(proximityUUID: beacon.proximityUUID, major: beacon.major, minor: beacon.minor)
-        let logEntry = LogEntry(proximity: beacon.proximity, accuracy: beacon.accuracy, rssi: beacon.rssi)
+        let logEntry = LogEntry(timestamp: NSDate(), proximity: beacon.proximity, accuracy: beacon.accuracy, rssi: beacon.rssi)
         
         let bIDDescription = bID.description()
         
         if ((self.beacons[bIDDescription]) != nil) {
             // beacon does already exist in log --> add log entry
             
-            if self.beacons[bIDDescription]?.log.count >= logCapacity {
+            if self.logCapacity != nil && self.beacons[bIDDescription]?.log.count >= self.logCapacity! {
                 self.beacons[bIDDescription]?.log.removeAtIndex(0)
             }
             self.beacons[bIDDescription]?.log.append(logEntry)
@@ -78,8 +84,14 @@ class BeaconLogManager {
         } else {
             // beacon does not exist in log --> add new beacon
             self.beacons[bIDDescription] = BeaconLog(id: bID, log: [logEntry])
-            self.beacons[bIDDescription]?.log.reserveCapacity(logCapacity)
+            if self.logCapacity != nil {
+                self.beacons[bIDDescription]?.log.reserveCapacity(self.logCapacity!)
+            }
         }
+    }
+    
+    func clearLog() {
+        self.beacons.removeAll(keepCapacity: false)
     }
     
     func getBeacons() -> [BeaconID] {
@@ -91,7 +103,7 @@ class BeaconLogManager {
         return result
     }
     
-    func getActualLogEntryForBeacon(beacon: BeaconID) -> LogEntry? {
+    func getLatestLogEntryForBeacon(beacon: BeaconID) -> LogEntry? {
         let id = beacon.description()
         
         if let bLog = self.beacons[id] {

@@ -13,13 +13,11 @@
 		E040633A19E549ED00C0A3D0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E040632B19E549ED00C0A3D0 /* Main.storyboard */; };
 		E040633B19E549ED00C0A3D0 /* BeaconViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040632E19E549ED00C0A3D0 /* BeaconViewController.swift */; };
 		E040633C19E549ED00C0A3D0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E040632F19E549ED00C0A3D0 /* Images.xcassets */; };
-		E040633D19E549ED00C0A3D0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E040633019E549ED00C0A3D0 /* Info.plist */; };
 		E040633E19E549ED00C0A3D0 /* BeaconLogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040633219E549ED00C0A3D0 /* BeaconLogManager.swift */; };
-		E040633F19E549ED00C0A3D0 /* BeaconModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040633319E549ED00C0A3D0 /* BeaconModel.swift */; };
+		E040633F19E549ED00C0A3D0 /* BeaconRadar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040633319E549ED00C0A3D0 /* BeaconRadar.swift */; };
 		E040634019E549ED00C0A3D0 /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040633519E549ED00C0A3D0 /* Observable.swift */; };
 		E040634119E549ED00C0A3D0 /* Observer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040633619E549ED00C0A3D0 /* Observer.swift */; };
 		E040634519E54A0A00C0A3D0 /* IndoorLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040634319E54A0A00C0A3D0 /* IndoorLocalizationTests.swift */; };
-		E040634619E54A0A00C0A3D0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E040634419E54A0A00C0A3D0 /* Info.plist */; };
 		E040635119E70AB000C0A3D0 /* BeaconDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */; };
 		E040635319E7B32000C0A3D0 /* BeaconRangingChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */; };
 		FAA8A0DDB4263D024491547F /* libPods-BeaconRadio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 096DBBE9DC6CC1E4D7CE2CE3 /* libPods-BeaconRadio.a */; };
@@ -70,7 +68,7 @@
 		E040632F19E549ED00C0A3D0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E040633019E549ED00C0A3D0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E040633219E549ED00C0A3D0 /* BeaconLogManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconLogManager.swift; sourceTree = "<group>"; };
-		E040633319E549ED00C0A3D0 /* BeaconModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconModel.swift; sourceTree = "<group>"; };
+		E040633319E549ED00C0A3D0 /* BeaconRadar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconRadar.swift; sourceTree = "<group>"; };
 		E040633519E549ED00C0A3D0 /* Observable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
 		E040633619E549ED00C0A3D0 /* Observer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Observer.swift; sourceTree = "<group>"; };
 		E040634319E54A0A00C0A3D0 /* IndoorLocalizationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndoorLocalizationTests.swift; sourceTree = "<group>"; };
@@ -165,7 +163,7 @@
 		E040633119E549ED00C0A3D0 /* model */ = {
 			isa = PBXGroup;
 			children = (
-				E040633319E549ED00C0A3D0 /* BeaconModel.swift */,
+				E040633319E549ED00C0A3D0 /* BeaconRadar.swift */,
 				E040633219E549ED00C0A3D0 /* BeaconLogManager.swift */,
 			);
 			path = model;
@@ -293,7 +291,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E040633D19E549ED00C0A3D0 /* Info.plist in Resources */,
 				E040633C19E549ED00C0A3D0 /* Images.xcassets in Resources */,
 				E040633919E549ED00C0A3D0 /* LaunchScreen.xib in Resources */,
 				E040633A19E549ED00C0A3D0 /* Main.storyboard in Resources */,
@@ -304,7 +301,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E040634619E54A0A00C0A3D0 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,7 +348,7 @@
 				E040633E19E549ED00C0A3D0 /* BeaconLogManager.swift in Sources */,
 				E040634119E549ED00C0A3D0 /* Observer.swift in Sources */,
 				E040634019E549ED00C0A3D0 /* Observable.swift in Sources */,
-				E040633F19E549ED00C0A3D0 /* BeaconModel.swift in Sources */,
+				E040633F19E549ED00C0A3D0 /* BeaconRadar.swift in Sources */,
 				E040633B19E549ED00C0A3D0 /* BeaconViewController.swift in Sources */,
 				E040633819E549ED00C0A3D0 /* AppDelegate.swift in Sources */,
 				E040635119E70AB000C0A3D0 /* BeaconDetailsViewController.swift in Sources */,

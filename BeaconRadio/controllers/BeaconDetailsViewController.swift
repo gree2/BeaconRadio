@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreLocation
 
 class BeaconDetailsViewController: UIViewController, Observer {
     
@@ -18,23 +19,35 @@ class BeaconDetailsViewController: UIViewController, Observer {
     @IBOutlet weak var rssiLabel: UILabel!
     @IBOutlet weak var accuracyLabel: UILabel!
     
-    var beaconID: BeaconID?
+    var beacon: CLBeacon?
+    private var beaconID: BeaconID?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        update()
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
+        
+        if let b = self.beacon {
+            
+            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major, minor: b.minor)
+            
+            uuidLabel.text = b.proximityUUID.UUIDString
+            majorLabel.text = "\(b.major)"
+            minorLabel.text = "\(b.minor)"
+        }
+        
+        update()
+        
         // register observer
-        BeaconModel.sharedInstance.addObserver(self)
+        BeaconRadar.sharedInstance.addObserver(self)
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         // unregister observer
-        BeaconModel.sharedInstance.removeObserver(self)
+        BeaconRadar.sharedInstance.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -45,25 +58,23 @@ class BeaconDetailsViewController: UIViewController, Observer {
         
         if segue.identifier == "BeaconRangingChart" {
             let chartViewController = segue.destinationViewController as BeaconRangingChartViewController
-            chartViewController.beaconID = self.beaconID
+            chartViewController.beacon = self.beacon
         }
     }
     
     // MARK: Observer protocol
     func update() {
 
-        
-        if let bID = self.beaconID {
-            uuidLabel.text = bID.proximityUUID.UUIDString
-            majorLabel.text = "\(bID.major)"
-            minorLabel.text = "\(bID.minor)"
-            
-            if let log = BeaconModel.sharedInstance.getActualLogEntryForBeacon(bID) {
-                rssiLabel.text = "\(log.rssi) db"
-                accuracyLabel.text = "\(Double(Int(log.accuracy*100))/100.0) m"
-                proximityLabel.text = log.proximity.description()
-            }
+        self.beacon = BeaconRadar.sharedInstance.getBeacon(self.beaconID!)
+
+        if let b = self.beacon {
+            rssiLabel.text = "\(b.rssi) db"
+            accuracyLabel.text = "\(Double(Int(b.accuracy*100))/100.0) m"
+            proximityLabel.text = b.proximity.description()
+        } else {
+            rssiLabel.text = ""
+            accuracyLabel.text = ""
+            proximityLabel.text = "Unknown"
         }
-        
     }
 }
