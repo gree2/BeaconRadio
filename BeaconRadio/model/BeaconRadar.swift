@@ -98,7 +98,7 @@ class BeaconRadar: NSObject, CLLocationManagerDelegate, Observable {
         for beacon in beacons {
             if beacon is CLBeacon {
                 let b = beacon as CLBeacon
-                self.rangedBeacons.updateValue(b, forKey: BeaconID(proximityUUID: b.proximityUUID, major: b.major, minor: b.minor).description() )
+                self.rangedBeacons.updateValue(b, forKey: BeaconID(proximityUUID: b.proximityUUID, major: b.major.integerValue, minor: b.minor.integerValue).description() )
             }
         }
         

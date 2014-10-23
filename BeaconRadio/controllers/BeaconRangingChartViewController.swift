@@ -30,7 +30,7 @@ class BeaconRangingChartViewController: UIViewController, Observer {
         // register observer
         
         if let b = self.beacon {
-            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major, minor: b.minor)
+            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major.integerValue, minor: b.minor.integerValue)
         }
         
         setup()

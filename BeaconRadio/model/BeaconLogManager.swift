@@ -68,7 +68,7 @@ class BeaconLogManager {
     
     func addLogEntry(beacon: CLBeacon) {
         
-        let bID = BeaconID(proximityUUID: beacon.proximityUUID, major: beacon.major, minor: beacon.minor)
+        let bID = BeaconID(proximityUUID: beacon.proximityUUID, major: beacon.major.integerValue, minor: beacon.minor.integerValue)
         let logEntry = LogEntry(timestamp: NSDate(), proximity: beacon.proximity, accuracy: beacon.accuracy, rssi: beacon.rssi)
         
         let bIDDescription = bID.description()
@@ -138,11 +138,10 @@ class BeaconLogManager {
                 
                 let beaconLog = self.beacons[key]!
                 
-                content += "# \(beaconLog.id.description())\n"
-                content += "timestamp | rssi (db) | accuracy (m) | proximity\n"
+                content += "timestamp;proximity;rssi;accuracy"
                 
                 for logEntry in beaconLog.log {
-                    content += "\(dateFormatter.stringFromDate(logEntry.timestamp))|\(logEntry.rssi!)|\(logEntry.accuracy!)|\(logEntry.proximity.description())\n"
+                    content += "\n\(dateFormatter.stringFromDate(logEntry.timestamp));\(logEntry.proximity.rawValue);\(logEntry.rssi!);\(logEntry.accuracy!)"
                 }
             }
             

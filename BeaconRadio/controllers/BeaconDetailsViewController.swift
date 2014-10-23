@@ -39,7 +39,7 @@ class BeaconDetailsViewController: UIViewController, Observer {
         
         if let b = self.beacon {
             
-            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major, minor: b.minor)
+            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major.integerValue, minor: b.minor.integerValue)
             
             uuidLabel.text = b.proximityUUID.UUIDString
             majorLabel.text = "\(b.major)"
@@ -84,11 +84,13 @@ class BeaconDetailsViewController: UIViewController, Observer {
             accuracyLabel.text = ""
             proximityLabel.text = "Unknown"
         }
-        
-        if self.beacon != nil && self.isLogging {
+
+
+        if self.beacon != nil && self.isLogging && self.beacon?.proximity != CLProximity.Unknown {
             self.log2fileLogManger.addLogEntry(self.beacon!)
             self.log2FileItemsLabel.text = "Items: \(self.log2fileLogManger.countLogEntriesForBeacon(self.beaconID!)!)"
         }
+
     }
     
     @IBAction func log2FileBtnPressed(sender: UIButton) {
@@ -97,9 +99,9 @@ class BeaconDetailsViewController: UIViewController, Observer {
             // stop
             
             let dateFormatter = NSDateFormatter()
-            dateFormatter.dateFormat = "yyyy-mm-dd_hh:mm:ss_"
+            dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss_"
             
-            let filename = "\(dateFormatter.stringFromDate(NSDate()))\(self.beaconID!.description()).txt"
+            let filename = "\(dateFormatter.stringFromDate(NSDate()))\(self.beaconID!.description()).csv"
             
             self.log2fileLogManger.save2File(filename)
             self.log2fileLogManger.clearLog()
