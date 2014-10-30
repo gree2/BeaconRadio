@@ -100,6 +100,88 @@
             </objects>
             <point key="canvasLocation" x="1589" y="-604"/>
         </scene>
+        <!--Motion-->
+        <scene sceneID="fad-fH-ISA">
+            <objects>
+                <viewController id="Hu5-JC-pp3" customClass="MotionMeasurementController" customModule="BeaconRadio" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="iYD-FO-zFI"/>
+                        <viewControllerLayoutGuide type="bottom" id="b4b-mt-dwS"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="9MP-Bd-Aa6">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wCr-vY-yl5">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="239" width="368" height="21"/>
+                                </variation>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="po3-R5-xey">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="289" width="368" height="21"/>
+                                </variation>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5if-D1-UiB">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="347" width="368" height="21"/>
+                                </variation>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f49-wu-fwa">
+                                <rect key="frame" x="-23" y="-15" width="46" height="30"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="404" width="46" height="30"/>
+                                </variation>
+                                <connections>
+                                    <action selector="query:" destination="Hu5-JC-pp3" eventType="touchUpInside" id="yim-FY-9F6"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="wCr-vY-yl5"/>
+                                <exclude reference="po3-R5-xey"/>
+                                <exclude reference="5if-D1-UiB"/>
+                                <exclude reference="f49-wu-fwa"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="wCr-vY-yl5"/>
+                                <include reference="po3-R5-xey"/>
+                                <include reference="5if-D1-UiB"/>
+                                <include reference="f49-wu-fwa"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Motion" id="N4E-L8-hL8"/>
+                    <connections>
+                        <outlet property="distance" destination="wCr-vY-yl5" id="wWu-sI-3yZ"/>
+                        <outlet property="speed" destination="po3-R5-xey" id="OOt-ik-YQs"/>
+                        <outlet property="startstopBtn" destination="f49-wu-fwa" id="46Y-3v-XUE"/>
+                        <outlet property="steps" destination="5if-D1-UiB" id="4Q6-vj-g8G"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CxF-ou-fDq" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="748.5" y="-1273"/>
+        </scene>
         <!--Details-->
         <scene sceneID="FaU-Zq-fbr">
             <objects>
@@ -447,11 +529,82 @@
                     </tabBar>
                     <connections>
                         <segue destination="ddp-VV-Evp" kind="relationship" relationship="viewControllers" id="o1Q-PA-PkW"/>
+                        <segue destination="Hu5-JC-pp3" kind="relationship" relationship="viewControllers" id="WeV-cr-SNN"/>
+                        <segue destination="l3O-A7-WnC" kind="relationship" relationship="viewControllers" id="VkZ-et-WgS"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="0.0" y="0.0"/>
+        </scene>
+        <!--CMStepCounter-->
+        <scene sceneID="AM2-9y-k3C">
+            <objects>
+                <viewController title="CMStepCounter" id="l3O-A7-WnC" customClass="StepCounterViewController" customModule="BeaconRadio" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cGP-7t-ikc"/>
+                        <viewControllerLayoutGuide type="bottom" id="Iaz-pZ-Zfo"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Hiw-M4-4C7">
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UV9-jJ-nVK">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="28" width="368" height="21"/>
+                                </variation>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MWr-iy-uHa">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="57" width="368" height="21"/>
+                                </variation>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HqI-EO-yrs">
+                                <rect key="frame" x="-23" y="-15" width="46" height="30"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="86" width="46" height="30"/>
+                                </variation>
+                                <connections>
+                                    <action selector="toggleStartStopBtn:" destination="l3O-A7-WnC" eventType="touchUpInside" id="htN-b2-2EJ"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="UV9-jJ-nVK"/>
+                                <exclude reference="MWr-iy-uHa"/>
+                                <exclude reference="HqI-EO-yrs"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="UV9-jJ-nVK"/>
+                                <include reference="MWr-iy-uHa"/>
+                                <include reference="HqI-EO-yrs"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="StepCounter" id="fKr-Rm-S7m"/>
+                    <connections>
+                        <outlet property="duration" destination="MWr-iy-uHa" id="HEq-Jz-ICi"/>
+                        <outlet property="startStopBtn" destination="HqI-EO-yrs" id="xTo-v6-vIc"/>
+                        <outlet property="steps" destination="UV9-jJ-nVK" id="rZY-fW-BHl"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="XVW-NR-0wP" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="816" y="685"/>
         </scene>
         <!--Beacon Ranging Chart View Controller-->
         <scene sceneID="8tp-l8-zuu">
