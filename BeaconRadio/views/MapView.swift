@@ -9,11 +9,12 @@
 import Foundation
 import UIKit
 
-class MapView: UIView, UIScrollViewDelegate {
+class MapView: UIView, UIScrollViewDelegate, ParticleViewDataSource {
     @IBOutlet private var view: UIView!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var mapImgView: UIImageView!
+    @IBOutlet weak var particleView: ParticleView!
     
     
     required init(coder aDecoder: NSCoder) {
@@ -21,6 +22,7 @@ class MapView: UIView, UIScrollViewDelegate {
         NSBundle.mainBundle().loadNibNamed("MapView", owner: self, options: nil)
         self.addSubview(self.view)
         scrollView.delegate = self
+        particleView.dataSource = self
     }
 
     func showMap(mapImg: UIImage) {
@@ -63,4 +65,8 @@ class MapView: UIView, UIScrollViewDelegate {
 
     }
     
+    // ParticleView DataSource
+    func particlesForParticleView(particleView: ParticleView) -> [Particle] {
+        return [Particle(x: 300, y: 200, orientation: 0), Particle(x: 300, y: 300, orientation: 90), Particle(x: 300, y: 400, orientation: 180), Particle(x: 300, y: 500, orientation: 270),Particle(x: 500, y: 200, orientation: 45), Particle(x: 500, y: 300, orientation: 135), Particle(x: 500, y: 400, orientation: 225), Particle(x: 500, y: 500, orientation: 315)] //
+    }
 }

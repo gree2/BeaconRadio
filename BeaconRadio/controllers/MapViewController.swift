@@ -21,9 +21,6 @@ class MapViewController: UIViewController {
     // MARK: UIViewController methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
-        
     }
     
     override func viewDidAppear(animated: Bool) {

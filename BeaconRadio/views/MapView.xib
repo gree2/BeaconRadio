@@ -8,6 +8,7 @@
             <connections>
                 <outlet property="containerView" destination="vJj-9Y-gUu" id="y5S-L0-RWD"/>
                 <outlet property="mapImgView" destination="Ivv-oK-bO2" id="vSA-UJ-J0x"/>
+                <outlet property="particleView" destination="Jih-UB-iiG" id="i2i-iq-tUO"/>
                 <outlet property="scrollView" destination="OrW-qa-3Tm" id="7aF-eP-q35"/>
                 <outlet property="view" destination="iN0-l3-epB" id="1D2-f7-Bd4"/>
             </connections>
@@ -26,6 +27,10 @@
                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ivv-oK-bO2">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 </imageView>
+                                <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jih-UB-iiG" customClass="ParticleView" customModule="BeaconRadio" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
