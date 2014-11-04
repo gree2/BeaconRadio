@@ -21,13 +21,13 @@
 		E040634519E54A0A00C0A3D0 /* IndoorLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040634319E54A0A00C0A3D0 /* IndoorLocalizationTests.swift */; };
 		E040635119E70AB000C0A3D0 /* BeaconDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */; };
 		E040635319E7B32000C0A3D0 /* BeaconRangingChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */; };
+		E04F6B661A07C69700C7F78E /* ParticleMapView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E04F6B651A07C69700C7F78E /* ParticleMapView.xib */; };
 		E09460F81A00D0F70026E002 /* StepCounterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460F71A00D0F70026E002 /* StepCounterViewController.swift */; };
 		E09460FA1A0261280026E002 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460F91A0261280026E002 /* Map.swift */; };
 		E09460FC1A0261380026E002 /* MapsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460FB1A0261380026E002 /* MapsManager.swift */; };
 		E09460FE1A02850F0026E002 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460FD1A02850F0026E002 /* UIImage.swift */; };
 		E09461001A02AD070026E002 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460FF1A02AD070026E002 /* MapViewController.swift */; };
-		E09461021A037C960026E002 /* MapView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E09461011A037C960026E002 /* MapView.xib */; };
-		E09461041A037DE80026E002 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09461031A037DE80026E002 /* MapView.swift */; };
+		E09461041A037DE80026E002 /* ParticleMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09461031A037DE80026E002 /* ParticleMapView.swift */; };
 		E09461061A03FA5D0026E002 /* ParticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09461051A03FA5D0026E002 /* ParticleView.swift */; };
 		E09461081A03FAAA0026E002 /* Particle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09461071A03FAAA0026E002 /* Particle.swift */; };
 		FAA8A0DDB4263D024491547F /* libPods-BeaconRadio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 096DBBE9DC6CC1E4D7CE2CE3 /* libPods-BeaconRadio.a */; };
@@ -87,13 +87,13 @@
 		E040635019E70AB000C0A3D0 /* BeaconDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconDetailsViewController.swift; sourceTree = "<group>"; };
 		E040635219E7B32000C0A3D0 /* BeaconRangingChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconRangingChartViewController.swift; sourceTree = "<group>"; };
 		E040635419E7C17C00C0A3D0 /* BeaconRadio-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BeaconRadio-Bridging-Header.h"; sourceTree = "<group>"; };
+		E04F6B651A07C69700C7F78E /* ParticleMapView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ParticleMapView.xib; sourceTree = "<group>"; };
 		E09460F71A00D0F70026E002 /* StepCounterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StepCounterViewController.swift; sourceTree = "<group>"; };
 		E09460F91A0261280026E002 /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		E09460FB1A0261380026E002 /* MapsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapsManager.swift; sourceTree = "<group>"; };
 		E09460FD1A02850F0026E002 /* UIImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		E09460FF1A02AD070026E002 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
-		E09461011A037C960026E002 /* MapView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MapView.xib; sourceTree = "<group>"; };
-		E09461031A037DE80026E002 /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		E09461031A037DE80026E002 /* ParticleMapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticleMapView.swift; sourceTree = "<group>"; };
 		E09461051A03FA5D0026E002 /* ParticleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticleView.swift; sourceTree = "<group>"; };
 		E09461071A03FAAA0026E002 /* Particle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Particle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -208,8 +208,8 @@
 		E040633719E549ED00C0A3D0 /* views */ = {
 			isa = PBXGroup;
 			children = (
-				E09461031A037DE80026E002 /* MapView.swift */,
-				E09461011A037C960026E002 /* MapView.xib */,
+				E09461031A037DE80026E002 /* ParticleMapView.swift */,
+				E04F6B651A07C69700C7F78E /* ParticleMapView.xib */,
 				E09461051A03FA5D0026E002 /* ParticleView.swift */,
 			);
 			path = views;
@@ -322,7 +322,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E040633C19E549ED00C0A3D0 /* Images.xcassets in Resources */,
-				E09461021A037C960026E002 /* MapView.xib in Resources */,
+				E04F6B661A07C69700C7F78E /* ParticleMapView.xib in Resources */,
 				E040633919E549ED00C0A3D0 /* LaunchScreen.xib in Resources */,
 				E040633A19E549ED00C0A3D0 /* Main.storyboard in Resources */,
 			);
@@ -383,7 +383,7 @@
 				E09460FC1A0261380026E002 /* MapsManager.swift in Sources */,
 				E040634019E549ED00C0A3D0 /* Observable.swift in Sources */,
 				E040633F19E549ED00C0A3D0 /* BeaconRadar.swift in Sources */,
-				E09461041A037DE80026E002 /* MapView.swift in Sources */,
+				E09461041A037DE80026E002 /* ParticleMapView.swift in Sources */,
 				E040633B19E549ED00C0A3D0 /* BeaconViewController.swift in Sources */,
 				E09460FA1A0261280026E002 /* Map.swift in Sources */,
 				E037AAA419F949ED00038DBA /* MotionMeasurementController.swift in Sources */,

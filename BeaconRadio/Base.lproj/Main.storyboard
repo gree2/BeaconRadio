@@ -519,16 +519,45 @@
                         <viewControllerLayoutGuide type="top" id="G77-jp-YDN"/>
                         <viewControllerLayoutGuide type="bottom" id="De6-7J-NZM"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="eWJ-gj-sDl" customClass="MapView" customModule="BeaconRadio" customModuleProvider="target">
+                    <view key="view" contentMode="scaleToFill" id="eWJ-gj-sDl">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="2" translatesAutoresizingMaskIntoConstraints="NO" id="eya-y7-U7s">
+                                <rect key="frame" x="16" y="20" width="568" height="531"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fnH-zr-hbq" customClass="ParticleMapView" customModule="BeaconRadio" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="568" height="531"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="fnH-zr-hbq" firstAttribute="leading" secondItem="eya-y7-U7s" secondAttribute="leading" id="2kM-wu-IZe"/>
+                                    <constraint firstItem="fnH-zr-hbq" firstAttribute="top" secondItem="eya-y7-U7s" secondAttribute="top" id="81H-5K-hAn"/>
+                                    <constraint firstAttribute="width" secondItem="fnH-zr-hbq" secondAttribute="width" id="Lmj-PG-oWv"/>
+                                    <constraint firstAttribute="bottom" secondItem="fnH-zr-hbq" secondAttribute="bottom" id="fsf-MS-KOQ"/>
+                                    <constraint firstAttribute="trailing" secondItem="fnH-zr-hbq" secondAttribute="trailing" id="jDB-uO-tlr"/>
+                                    <constraint firstAttribute="height" secondItem="fnH-zr-hbq" secondAttribute="height" id="tm8-uV-SUg"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="eya-y7-U7s" firstAttribute="trailing" secondItem="eWJ-gj-sDl" secondAttribute="trailingMargin" id="33g-UW-nHj"/>
+                            <constraint firstItem="eya-y7-U7s" firstAttribute="top" secondItem="G77-jp-YDN" secondAttribute="bottom" id="gDi-JG-byq"/>
+                            <constraint firstItem="eya-y7-U7s" firstAttribute="leading" secondItem="eWJ-gj-sDl" secondAttribute="leadingMargin" id="hB0-ux-0s8"/>
+                            <constraint firstItem="De6-7J-NZM" firstAttribute="top" secondItem="eya-y7-U7s" secondAttribute="bottom" id="zPr-QJ-FNL"/>
+                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Map" id="blp-YC-47Y"/>
+                    <connections>
+                        <outlet property="particleMapView" destination="fnH-zr-hbq" id="HYP-Ur-XVo"/>
+                        <outlet property="scrollView" destination="eya-y7-U7s" id="f9J-Pd-FkL"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Xfw-wl-YiK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-85.5" y="1312"/>
+            <point key="canvasLocation" x="-86" y="1312"/>
         </scene>
         <!--CMStepCounter-->
         <scene sceneID="AM2-9y-k3C">

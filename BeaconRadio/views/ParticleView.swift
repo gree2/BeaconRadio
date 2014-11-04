@@ -9,7 +9,7 @@
 
 class ParticleView: UIView {
     var dataSource: ParticleViewDataSource?
-    var particleSize: Double = 50.0 {
+    var particleSize: Double = 10.0 {
         didSet {
             if self.particleSize > 0 {
                 self.particleSize = oldValue
@@ -23,9 +23,17 @@ class ParticleView: UIView {
         }
     }
     
-    var arrowHeadSize: Double {
+    private var arrowHeadSize: Double {
         get {
             return self.particleSize * 0.3
+        }
+    }
+    
+    var lineWidth: Double = 1.0 {
+        didSet {
+            if self.lineWidth < 1.0 {
+                self.lineWidth = 1.0
+            }
         }
     }
     
@@ -47,16 +55,22 @@ class ParticleView: UIView {
             let particles = dataSource.particlesForParticleView(self)
             
             for particle in particles {
-                if isParticleInBounds(particle) {
+                if isParticleInRect(particle, rect: rect) {
                     drawParticle(particle)
                 }
             }
         }
     }
     
-    private func isParticleInBounds(particle:Particle) -> Bool {
-        return particle.x >= 0.0 && particle.x <= Double(self.bounds.size.width) &&
-                particle.y >= 0.0 && particle.y <= Double(self.bounds.size.width)
+    private func isParticleInRect(particle:Particle, rect:CGRect) -> Bool {
+        
+        let tail = pointOfParticleTail(particle)
+        let head = centerPointOfParticleHead(particle)
+        let right = rightPointOfParticleHead(head: head, particle: particle)
+        let left = leftPointOfParticleHead(head: head, particle: particle)
+        
+        
+        return CGRectContainsPoint(rect, tail) && CGRectContainsPoint(rect, head) && CGRectContainsPoint(rect, right) && CGRectContainsPoint(rect, left)
     }
     
     private func drawParticle(particle: Particle) {
@@ -69,7 +83,7 @@ class ParticleView: UIView {
         // drawing code goes here
         let context = UIGraphicsGetCurrentContext()
         CGContextSetStrokeColorWithColor(context, UIColor.redColor().CGColor)
-        CGContextSetLineWidth(context, 3.0)
+        CGContextSetLineWidth(context, CGFloat(self.lineWidth))
         
         CGContextBeginPath(context)
         CGContextMoveToPoint(context, tail.x, tail.y)
