@@ -47,16 +47,32 @@ class MapsManager {
         
         if let directories = dirs {
             let dir = directories[0];
-            let path = dir.stringByAppendingPathComponent("maps/\(name).png")
+            let mapPath = dir.stringByAppendingPathComponent("maps/\(name).png")
             
-            let mapImg = UIImage(contentsOfFile: path)
-            
-            // TODO: Read maps parameter from .plist file
-            
-            if mapImg != nil {
-                return Map(map: mapImg!, scale: 100, orientation: 0)
+            if let mapImg = UIImage(contentsOfFile: mapPath) {
+                
+                let plistPath = dir.stringByAppendingPathComponent("maps/\(name).plist")
+                
+                if let plist = NSDictionary(contentsOfFile: plistPath) {
+                    
+                    let scale = plist.valueForKey("scale") as Double
+                    let orientation = plist.valueForKey("orientation") as Double
+                    
+                    if scale <= 0 {
+                        println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Scale must be > 0.")
+                    }else if orientation < 0 || orientation >= 360 {
+                        println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Orientation must be 0 <= orientation < 360.")
+                    } else {
+                        return Map(map: mapImg, scale: scale, orientation: orientation)
+                    }
+                    
+                } else {
+                    println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'.")
+                }
+                
+            } else {
+                println("[ERROR] Couldn't load map named '\(name)'.")
             }
-            
         }
         return nil
     }
