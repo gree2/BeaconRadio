@@ -7,25 +7,16 @@
 //
 
 struct Particle {
-    let x: Double
-    let y: Double
-    let orientation: Double
+    let x: UInt // cm
+    let y: UInt // cm
+    let orientation: UInt // degree*10
     
-    init(x: Double, y: Double, orientation: Double) {
+    init(x: UInt, y: UInt, orientation: UInt) {
         
-        if x > 0 {
-            self.x = x
-        } else {
-            self.x = 0
-        }
+        self.x = x
+        self.y = y
         
-        if y > 0 {
-            self.y = y
-        } else {
-            self.y = 0
-        }
-        
-        if 0 < orientation  && orientation < 360 {
+        if 0 < orientation  && orientation < 3600 {
             self.orientation = orientation
         } else {
             self.orientation = 0

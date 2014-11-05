@@ -55,11 +55,11 @@ class MapsManager {
                 
                 if let plist = NSDictionary(contentsOfFile: plistPath) {
                     
-                    let scale = plist.valueForKey("scale") as Double
+                    let scale = plist.valueForKey("scale") as UInt
                     let orientation = plist.valueForKey("orientation") as Double
                     
-                    if scale <= 0 {
-                        println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Scale must be > 0.")
+                    if scale < 1 || scale > 100 {
+                        println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Scale must be 1 < scale <= 100.")
                     }else if orientation < 0 || orientation >= 360 {
                         println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Orientation must be 0 <= orientation < 360.")
                     } else {

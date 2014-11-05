@@ -8,12 +8,23 @@
 
 import Foundation
 
-class MapViewController: UIViewController, UIScrollViewDelegate, ParticleMapViewDataSource {
+class MapViewController: UIViewController, UIScrollViewDelegate, ParticleMapViewDataSource, Observer {
     
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var particleMapView: ParticleMapView!
     
-    private var map:Map?
+    
+    private lazy var map:Map? = {
+        return MapsManager().loadMap(name: "F007")
+    }()
+    
+    private lazy var particleFilter: ParticleFilter? = {
+        if let map = self.map {
+            return ParticleFilter(map: self.map!)
+        } else {
+            return nil
+        }
+    }()
     
 
     // MARK: UIViewController methods
@@ -21,9 +32,6 @@ class MapViewController: UIViewController, UIScrollViewDelegate, ParticleMapView
         super.viewDidLoad()
         self.scrollView.delegate = self
         self.particleMapView.dataSource = self
-        
-        let mapsManager = MapsManager()
-        self.map = mapsManager.loadMap(name: "F007")
         
         if let mapImg = self.map?.mapImg {
             self.particleMapView.showMap(mapImg)
@@ -33,14 +41,22 @@ class MapViewController: UIViewController, UIScrollViewDelegate, ParticleMapView
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
+        if let particleFilter = self.particleFilter {
+            particleFilter.addObserver(self)
+        }
+
         
         resetMapZoom()
         
-        self.particleMapView.update()
+        //self.particleMapView.update()
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
+        
+        if let particleFilter = self.particleFilter {
+            particleFilter.removeObserver(self)
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -58,6 +74,8 @@ class MapViewController: UIViewController, UIScrollViewDelegate, ParticleMapView
     }
 
     // MARK: Helper methods
+    
+    // FIXME: resetMapZoom
     private func resetMapZoom() {
         if let mapImg = self.map?.mapImg {
             
@@ -69,10 +87,11 @@ class MapViewController: UIViewController, UIScrollViewDelegate, ParticleMapView
             
             self.scrollView.setZoomScale(zoomScale, animated: false)
             self.scrollView.minimumZoomScale = zoomScale
-//            self.scrollView.maximumZoomScale = 2.0
+            // self.scrollView.maximumZoomScale = 2.0
         }
     }
     
+    // FIXME: centerMap
     private func centerMap() {
         let offsetX:CGFloat = max((self.scrollView.bounds.size.width - self.particleMapView.bounds.size.width) / 2, 0.0)
         let offsetY:CGFloat = max((self.scrollView.bounds.size.height - self.particleMapView.bounds.size.height) / 2, 0.0)
@@ -83,7 +102,40 @@ class MapViewController: UIViewController, UIScrollViewDelegate, ParticleMapView
     
     // MARK: ParticleView DataSource
     func particlesForParticleMapView(particleMapView: ParticleMapView) -> [Particle] {
-        return [Particle(x: 300, y: 200, orientation: 0), Particle(x: 300, y: 300, orientation: 90), Particle(x: 300, y: 400, orientation: 180), Particle(x: 300, y: 500, orientation: 270),Particle(x: 500, y: 200, orientation: 45), Particle(x: 500, y: 300, orientation: 135), Particle(x: 500, y: 400, orientation: 225), Particle(x: 500, y: 500, orientation: 315)] //
+
+        var viewParticles: [Particle] = []
+        
+        if let particleFilter = self.particleFilter {
+            let particles = particleFilter.particles
+            let map = particleFilter.map
+            
+            viewParticles.reserveCapacity(particles.count)
+            
+            let scaleX = self.particleMapView.mapSize.width/map.mapImg.size.width
+            let scaleY = self.particleMapView.mapSize.height/map.mapImg.size.height
+            
+            let scale = min(scaleX, scaleY)
+            println("scaleX: \(scaleX), scaleY: \(scaleY)")
+            
+            // do coordinate conversion
+            
+            for particle in particles {
+                let mapPixel = map.pos2Pixel(Position(x: particle.x, y: particle.y))
+                
+                let newParticle = Particle(x: UInt(mapPixel.x*scale), y: UInt(mapPixel.y*scale), orientation: particle.orientation)
+                
+                viewParticles.append(newParticle)
+            }
+            
+        }
+        
+        return viewParticles
     }
 
+    // MARK: Observer protocol
+    func update() {
+        self.particleMapView.update()
+    }
+    
+    
 }

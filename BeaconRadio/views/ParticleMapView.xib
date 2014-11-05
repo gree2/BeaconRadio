@@ -11,16 +11,16 @@
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="UIImageView">
+        <view contentMode="scaleAspectFill" id="iN0-l3-epB" customClass="UIImageView">
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vZr-Sn-93e" customClass="ParticleView" customModule="BeaconRadio" customModuleProvider="target">
+                <view contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="vZr-Sn-93e" customClass="ParticleView" customModule="BeaconRadio" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <color key="backgroundColor" red="1" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="vZr-Sn-93e" secondAttribute="trailing" id="9vb-0c-fLX"/>
                 <constraint firstItem="vZr-Sn-93e" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="b0a-r2-SyN"/>
