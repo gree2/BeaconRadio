@@ -514,7 +514,7 @@
         <!--Map-->
         <scene sceneID="0Fj-kF-n30">
             <objects>
-                <viewController id="ket-Ir-vai" customClass="MapViewController" customModule="BeaconRadio" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="ket-Ir-vai" customClass="ParticleMapViewController" customModule="BeaconRadio" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="G77-jp-YDN"/>
                         <viewControllerLayoutGuide type="bottom" id="De6-7J-NZM"/>
@@ -523,10 +523,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="2" translatesAutoresizingMaskIntoConstraints="NO" id="eya-y7-U7s">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" maximumZoomScale="2" translatesAutoresizingMaskIntoConstraints="NO" id="eya-y7-U7s">
                                 <rect key="frame" x="16" y="20" width="568" height="531"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fnH-zr-hbq" customClass="ParticleMapView" customModule="BeaconRadio" customModuleProvider="target">
+                                    <view contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="fnH-zr-hbq" customClass="ParticleMapView" customModule="BeaconRadio" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="568" height="531"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>

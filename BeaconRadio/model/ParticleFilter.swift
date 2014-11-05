@@ -13,7 +13,11 @@ class ParticleFilter: Observable {
     let map: Map
     
     private let particleSetSize = 100
-    private var particleSet: [Particle] = []
+    private var particleSet: [Particle] = [] {
+        didSet {
+            notifyObservers()
+        }
+    }
     
     var particles: [Particle] {
         get {
