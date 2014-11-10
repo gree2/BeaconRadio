@@ -9,17 +9,21 @@
 struct Particle {
     let x: UInt // cm
     let y: UInt // cm
-    let orientation: UInt // degree*10
+    let orientation: UInt // degree
     
     init(x: UInt, y: UInt, orientation: UInt) {
         
         self.x = x
         self.y = y
         
-        if 0 < orientation  && orientation < 3600 {
+        if 0 < orientation  && orientation < 360 {
             self.orientation = orientation
         } else {
             self.orientation = 0
         }
+    }
+    
+    func description() -> String {
+        return "Particle with x: \(self.x), y: \(self.y), orientation: \(self.orientation)"
     }
 }

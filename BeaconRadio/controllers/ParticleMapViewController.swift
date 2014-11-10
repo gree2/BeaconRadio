@@ -40,9 +40,8 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         
         if let particleFilter = self.particleFilter {
             particleFilter.addObserver(self)
+            particleFilter.startLocalization()
         }
-
-        self.particleMapView.update()
     }
     
     override func viewDidDisappear(animated: Bool) {

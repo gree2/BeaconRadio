@@ -31,6 +31,7 @@ class ParticleMapView: UIImageView {
             if let mapImg = dataSource.mapImgForParticleMapView(self) {
                 let particles = dataSource.particlesForParticleMapView(self)
                 self.image = drawParticleMapImg(mapImg, particles: particles)
+                self.setNeedsDisplay()
             }
         }
     }
@@ -120,7 +121,7 @@ class ParticleMapView: UIImageView {
     }
     
     private func pointOfParticleTail(particle: Particle) -> CGPoint {
-        let angle: Double = degree2Rad(Double(particle.orientation)/10 + 180.0)
+        let angle: Double = degree2Rad(Double(particle.orientation) + 180.0)
         let x = Double(particle.x) + sin(angle) * (Double(self.particleSize) * 0.5)
         let y = Double(particle.y) + cos(angle) * (Double(self.particleSize) * 0.5)
         
@@ -128,7 +129,7 @@ class ParticleMapView: UIImageView {
     }
     
     private func centerPointOfParticleHead(particle: Particle) -> CGPoint {
-        let angle: Double = degree2Rad(Double(particle.orientation)/10)
+        let angle: Double = degree2Rad(Double(particle.orientation))
         let x = Double(particle.x) + sin(angle) * (Double(self.particleSize) * 0.5)
         let y = Double(particle.y) + cos(angle) * (Double(self.particleSize) * 0.5)
         
@@ -136,7 +137,7 @@ class ParticleMapView: UIImageView {
     }
     
     private func leftPointOfParticleHead(head point: CGPoint, particle: Particle) -> CGPoint {
-        var angle: Double = (Double(particle.orientation)/10 + self.arrowHeadAngle/2)%360
+        var angle: Double = (Double(particle.orientation) + self.arrowHeadAngle/2)%360
         
         if angle < 0 {
             angle = 360 + angle
@@ -146,7 +147,7 @@ class ParticleMapView: UIImageView {
     }
     
     private func rightPointOfParticleHead(head point: CGPoint, particle: Particle) -> CGPoint {
-        var angle: Double = (Double(particle.orientation)/10 - self.arrowHeadAngle/2) % 360
+        var angle: Double = (Double(particle.orientation) - self.arrowHeadAngle/2) % 360
         
         if angle < 0 {
             angle = 360 + angle
