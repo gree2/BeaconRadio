@@ -13,7 +13,7 @@ import CoreLocation
 class MotionModel: NSObject, CLLocationManagerDelegate {
     private lazy var operationQueue: NSOperationQueue = {
         let queue = NSOperationQueue()
-        queue.qualityOfService = .UserInitiated
+        queue.qualityOfService = NSQualityOfService.Background
         
         return queue
         }()
@@ -143,14 +143,6 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
     
     func motionDiffToLastMotion() -> MotionData {
      
-//        var startTimestamp: NSDate
-//        
-//        if self.pedometerStore.count == 1 {
-//             // if it is the first pedometer data
-//        } else {
-//            startTimestamp = self.pedometerStore[0].endDate // // use timestamp of last pedometer data (reason: distance is commulative)
-//        }
-        
         switch self.pedometerStore.count {
         case 0:
             return MotionData(x: 0, y: 0, orientation: currentHeading()) // TODO

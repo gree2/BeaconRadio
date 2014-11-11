@@ -12,22 +12,20 @@ class ParticleFilter: NSObject, Observable {
     
     let map: Map
     
-    private let runFilterTimeInterval = 5.0
+    private let runFilterTimeInterval = 2.0
     private var runFilterTimer: NSTimer?
     private lazy var operationQueue: NSOperationQueue = {
         let queue = NSOperationQueue()
         queue.qualityOfService = .UserInitiated
-        
         return queue
     }()
     
     private let particleSetSize = 10
-    private var particleSet: [Particle] = []
-    /* {
+    private var particleSet: [Particle] = [] {
         didSet {
             notifyObservers()
         }
-    }*/
+    }
     
     private lazy var motionModel = MotionModel()
     private lazy var measurementModel = MeasurementModel()
@@ -53,17 +51,18 @@ class ParticleFilter: NSObject, Observable {
         
         if self.particleSet.isEmpty {
             let operation = NSBlockOperation({
-                self.particleSet = self.generateParticleSet()
+                let particles = self.generateParticleSet()
+                
+                // MainThread: set particles and notify Observers
+                let updateOp = NSBlockOperation(block: {
+                    self.particleSet = particles
+                    self.startTimer()
+                })
+                NSOperationQueue.mainQueue().addOperation(updateOp)
             })
             
-            operation.completionBlock = {
-                self.notifyObservers()
-                self.startTimer()
-            }
-            operation.qualityOfService = .UserInitiated
-            operation.queuePriority = .High
-            
             self.operationQueue.addOperation(operation)
+            
         } else {
             startTimer()
         }
@@ -76,7 +75,6 @@ class ParticleFilter: NSObject, Observable {
         // setup NSTimer
         runFilterTimer = NSTimer(timeInterval: runFilterTimeInterval, target: self, selector: "filter", userInfo: nil, repeats: true)
         NSRunLoop.mainRunLoop().addTimer(runFilterTimer!, forMode: NSRunLoopCommonModes)
-
     }
     
     func stopLocalization() {
@@ -87,30 +85,22 @@ class ParticleFilter: NSObject, Observable {
     }
     
     func filter() {
-        println("Timer called")
-        var particlesT1: [Particle]?
         
         let operation = NSBlockOperation(block: {
+            println("Timer called")
             let particlesT0 = self.particles // copies particleset
             
-            for particle in particlesT0 {
-                println(particle.description())
-            }
             let motion = self.motionModel.motionDiffToLastMotion()
             println(motion.description())
-            particlesT1 = self.mcl(particlesT0, motion: motion)
-            // set particles in MainThread
+            let particlesT1 = self.mcl(particlesT0, motion: motion)
+
+            
+            // MainThread: set particles and notify Observers
+            let updateOp = NSBlockOperation(block: {
+                self.particleSet = particlesT1 // -> notifyObservers
+            })
+            NSOperationQueue.mainQueue().addOperation(updateOp)
         })
-        
-        operation.completionBlock = {
-            if particlesT1 != nil {
-                self.particleSet = particlesT1!
-                self.notifyObservers()
-            }
-        }
-        
-        operation.qualityOfService = .UserInitiated
-        operation.queuePriority = .High
         
         self.operationQueue.addOperation(operation)
     }
@@ -191,8 +181,8 @@ class ParticleFilter: NSObject, Observable {
         return map.isCellFree(Position(x: particle.x, y: particle.y))
     }
     
-    // MARK: Observable protocol
     
+    // MARK: Observable protocol
     private var observers = NSMutableSet()
     
     func addObserver(o: Observer) {

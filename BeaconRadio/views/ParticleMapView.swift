@@ -27,7 +27,6 @@ class ParticleMapView: UIView {
     var dataSource: ParticleMapViewDataSource?
     
     override func drawRect(rect: CGRect) {
-        println("Redraw ParticleView1")
         if let dataSource = self.dataSource {
             if let mapImg = dataSource.mapImgForParticleMapView(self) {
                 let particles = dataSource.particlesForParticleMapView(self)
@@ -35,10 +34,8 @@ class ParticleMapView: UIView {
                 
                 let context = UIGraphicsGetCurrentContext()
                 CGContextDrawImage(context, rect, image.CGImage)
-                println("Redraw ParticleView2")
             }
         }
-
     }
     
     // MARK: ParticleMapImg drawing
