@@ -60,7 +60,8 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
     
     // MARK: Observer protocol
     func update() {
-        self.particleMapView.update()
+        println("View needs update")
+        self.particleMapView.setNeedsDisplay()
     }
 
     

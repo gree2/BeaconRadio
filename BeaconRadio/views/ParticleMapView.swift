@@ -7,7 +7,7 @@
 //
 
 
-class ParticleMapView: UIImageView {
+class ParticleMapView: UIView {
     
     // MARK: Initializer
     override init() {
@@ -26,16 +26,20 @@ class ParticleMapView: UIImageView {
     // MARK: View's methods
     var dataSource: ParticleMapViewDataSource?
     
-    func update() {
+    override func drawRect(rect: CGRect) {
+        println("Redraw ParticleView1")
         if let dataSource = self.dataSource {
             if let mapImg = dataSource.mapImgForParticleMapView(self) {
                 let particles = dataSource.particlesForParticleMapView(self)
-                self.image = drawParticleMapImg(mapImg, particles: particles)
-                self.setNeedsDisplay()
+                let image = drawParticleMapImg(mapImg, particles: particles)
+                
+                let context = UIGraphicsGetCurrentContext()
+                CGContextDrawImage(context, rect, image.CGImage)
+                println("Redraw ParticleView2")
             }
         }
+
     }
-    
     
     // MARK: ParticleMapImg drawing
     var particleSize: Double = 10.0 {

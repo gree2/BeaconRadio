@@ -12,7 +12,7 @@ class ParticleFilter: NSObject, Observable {
     
     let map: Map
     
-    private let runFilterTimeInterval = 20.0
+    private let runFilterTimeInterval = 5.0
     private var runFilterTimer: NSTimer?
     private lazy var operationQueue: NSOperationQueue = {
         let queue = NSOperationQueue()
