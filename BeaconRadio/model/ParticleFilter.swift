@@ -30,6 +30,7 @@ class ParticleFilter: NSObject, Observable {
     }*/
     
     private lazy var motionModel = MotionModel()
+    private lazy var measurementModel = MeasurementModel()
     
     
     var particles: [Particle] {
@@ -115,9 +116,48 @@ class ParticleFilter: NSObject, Observable {
     }
     
     // MARK: MCL algorithm
-    private func mcl(particles: [Particle], motion: MotionModel.MotionData) -> [Particle] {
+    private func mcl(particles_t0: [Particle], motion: MotionModel.MotionData) -> [Particle] {
         
-        return particles.map({particle in Particle(x: particle.x + motion.x, y: particle.y + motion.y, orientation: motion.orientation)})
+        // integrate motion
+        let particles_t1 = particles_t0.map({particle in Particle(x: particle.x + motion.x, y: particle.y + motion.y, orientation: motion.orientation)})
+        
+        // weight particles
+        var weightedParticleSet: [(weight: Double,particle: Particle)] = []
+        weightedParticleSet.reserveCapacity(particles_t1.count)
+        
+        for particle in particles_t1 {
+            var weight: Double = self.measurementModel.weightParticle(particle, withMap: self.map)
+            
+            if weightedParticleSet.count > 1 {
+                weight += weightedParticleSet.last!.0 // add weigt of predecessor
+            }
+            
+            weightedParticleSet += [(weight: weight, particle: particle)]
+        }
+        
+        
+        // roulette
+        var particles_t2: [Particle] = []
+        particles_t2.reserveCapacity(weightedParticleSet.count)
+        
+        while particles_t2.count < self.particleSetSize {
+            
+            let random = Double(UInt(arc4random_uniform(UInt32(weightedParticleSet.last!.weight))))
+            
+            
+            var index = 0
+            
+            for var i: Int = 0; i < weightedParticleSet.count; ++i {
+                if weightedParticleSet[i].weight < random {
+                    index = i
+                } else {
+                    break;
+                }
+            }
+            particles_t2.append(weightedParticleSet[index].particle)
+        }
+        
+        return particles_t2
     }
     
     // MARK: Particle generation

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E015CF981A0B6C3800C4D4F2 /* MotionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E015CF971A0B6C3800C4D4F2 /* MotionModel.swift */; };
+		E0181F7F1A10CAB8003D9E2D /* MeasurementModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0181F7E1A10CAB8003D9E2D /* MeasurementModel.swift */; };
 		E037AAA419F949ED00038DBA /* MotionMeasurementController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E037AAA319F949ED00038DBA /* MotionMeasurementController.swift */; };
 		E040631219E3BCD900C0A3D0 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E040631119E3BCD900C0A3D0 /* CoreLocation.framework */; };
 		E040633819E549ED00C0A3D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E040632819E549ED00C0A3D0 /* AppDelegate.swift */; };
@@ -69,6 +70,7 @@
 		95ABF6B9C87707F0FF76C6C5 /* Pods-BeaconRadio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BeaconRadio.release.xcconfig"; path = "Pods/Target Support Files/Pods-BeaconRadio/Pods-BeaconRadio.release.xcconfig"; sourceTree = "<group>"; };
 		980E73A51563FD00165D0F1B /* Pods-BeaconRadio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BeaconRadio.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BeaconRadio/Pods-BeaconRadio.debug.xcconfig"; sourceTree = "<group>"; };
 		E015CF971A0B6C3800C4D4F2 /* MotionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotionModel.swift; sourceTree = "<group>"; };
+		E0181F7E1A10CAB8003D9E2D /* MeasurementModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasurementModel.swift; sourceTree = "<group>"; };
 		E037AAA319F949ED00038DBA /* MotionMeasurementController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotionMeasurementController.swift; sourceTree = "<group>"; };
 		E04062EA19E3BC8B00C0A3D0 /* BeaconRadio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeaconRadio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E040630119E3BC8B00C0A3D0 /* BeaconRadioTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeaconRadioTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -193,6 +195,7 @@
 				E09461071A03FAAA0026E002 /* Particle.swift */,
 				E04F6B671A08E5A100C7F78E /* ParticleFilter.swift */,
 				E015CF971A0B6C3800C4D4F2 /* MotionModel.swift */,
+				E0181F7E1A10CAB8003D9E2D /* MeasurementModel.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -381,6 +384,7 @@
 				E040633E19E549ED00C0A3D0 /* BeaconLogManager.swift in Sources */,
 				E040634119E549ED00C0A3D0 /* Observer.swift in Sources */,
 				E09460FC1A0261380026E002 /* MapsManager.swift in Sources */,
+				E0181F7F1A10CAB8003D9E2D /* MeasurementModel.swift in Sources */,
 				E040634019E549ED00C0A3D0 /* Observable.swift in Sources */,
 				E040633F19E549ED00C0A3D0 /* BeaconRadar.swift in Sources */,
 				E040633B19E549ED00C0A3D0 /* BeaconViewController.swift in Sources */,
