@@ -13,8 +13,8 @@ class MeasurementModel {
     func weightParticle(particle: Particle, withMap map: Map) -> Double {
         var weight = 0.0
         
-        if map.isCellFree(Position(x: particle.x, y: particle.y)) {
-           weight = 1.0
+        if map.isCellFree(particle.x, y: particle.y) {
+            weight = 1.0
         }
         
         return weight

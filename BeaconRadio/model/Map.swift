@@ -9,13 +9,8 @@
 import Foundation
 
 struct Size {
-    let x: UInt // cm
-    let y: UInt // cm
-}
-
-struct Position {
-    let x: UInt // cm
-    let y: UInt // cm
+    let x: Double // m
+    let y: Double // m
 }
 
 
@@ -23,28 +18,28 @@ class Map {
     let mapImg: UIImage
     let scale: UInt // 1m = x pixel (1 <= scale <= 100)
     let mapOrientation: Double // degree (0 = North, 90 = East, ...)
-    let sizeInCm: Size
-    
-    private let gridSize = 10 // in cm
+    let size: Size
     
     init (map: UIImage, scale: UInt, orientation: Double) {
         self.mapImg = map;
         self.scale = scale;
         self.mapOrientation = orientation
         
-        self.sizeInCm = Size(x: UInt(self.mapImg.size.width)/self.scale*100, y: UInt(self.mapImg.size.height)/self.scale*100)
+        self.size = Size(x: Double(self.mapImg.size.width)/Double(self.scale), y: Double(self.mapImg.size.height)/Double(self.scale))
     }
     
-    func isCellFree(pos: Position) -> Bool {
-        let color = self.mapImg.getPixelColor(pos2Pixel(pos))
-        let white = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        return color.isEqual(white) // white
+    func isCellFree(x: Double, y: Double) -> Bool {
+        
+        if 0 <= x && x <= self.size.x && 0 <= y && y <= self.size.y {
+            let color = self.mapImg.getPixelColor(pos2Pixel(x, y: y))
+            let white = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+            return color.isEqual(white) // white
+        }
+        return false
     }
     
-    func pos2Pixel(pos: Position) -> CGPoint {
-        let x = pos.x/(self.scale/100)
-        let y = pos.y/(self.scale/100)
-        return CGPoint(x: CGFloat(x), y: CGFloat(y))
+    private func pos2Pixel(x: Double, y: Double) -> CGPoint {
+        return CGPoint( x: CGFloat(x * Double(self.scale)), y: CGFloat(y * Double(self.scale)) )
     }
     
 }

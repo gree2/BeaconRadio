@@ -69,11 +69,26 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
     }
     
     func particlesForParticleMapView(view: ParticleMapView) -> [Particle] {
-        if let particleFilter = self.particleFilter {
-            return particleFilter.particles
-        } else {
-            return []
+
+        if let map = self.map {
+            if let particleFilter = self.particleFilter {
+                
+                let particles = particleFilter.particles
+                
+                // convert particles to right size
+                return particles.map({p in self.transformParticle(p, ToMapCS: map)})
+            }
         }
+        return []
+    }
+    
+    // from Meters to pixels
+    private func transformParticle(p: Particle, ToMapCS map: Map) -> Particle{
+        let x = p.x * Double(map.scale)
+        let y = p.y * Double(map.scale)
+        let theta = Angle.compassDeg2UnitCircleRad( Angle.unitCircleRad2CompassDeg(p.theta) - map.mapOrientation )
+        
+        return Particle(x: x, y: y, theta: theta)
     }
     
     

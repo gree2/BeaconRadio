@@ -12,15 +12,15 @@ class ParticleFilter: NSObject, Observable {
     
     let map: Map
     
-    private let runFilterTimeInterval = 2.0
+    private let runFilterTimeInterval = 20.0
     private var runFilterTimer: NSTimer?
     private lazy var operationQueue: NSOperationQueue = {
         let queue = NSOperationQueue()
-        queue.qualityOfService = .UserInitiated
+        queue.qualityOfService = .Background //.UserInitiated
         return queue
     }()
     
-    private let particleSetSize = 10
+    private let particleSetSize = 100
     private var particleSet: [Particle] = [] {
         didSet {
             notifyObservers()
@@ -44,7 +44,7 @@ class ParticleFilter: NSObject, Observable {
     
     init(map: Map) {
         self.map = map
-        super.init()        
+        super.init()
     }
     
     func startLocalization() {
@@ -60,7 +60,7 @@ class ParticleFilter: NSObject, Observable {
                 })
                 NSOperationQueue.mainQueue().addOperation(updateOp)
             })
-            
+            operation.qualityOfService = .UserInitiated
             self.operationQueue.addOperation(operation)
             
         } else {
@@ -68,7 +68,7 @@ class ParticleFilter: NSObject, Observable {
         }
         
         // start MotionTracking
-        self.motionModel.startMotionTracking()
+        self.motionModel.startMotionTracking(self.operationQueue)
     }
     
     private func startTimer() {
@@ -90,32 +90,33 @@ class ParticleFilter: NSObject, Observable {
             println("Timer called")
             let particlesT0 = self.particles // copies particleset
             
-            let motion = self.motionModel.motionDiffToLastMotion()
-            println(motion.description())
-            let particlesT1 = self.mcl(particlesT0, motion: motion)
+            let particlesT1 = self.mcl(particlesT0)
 
-            
             // MainThread: set particles and notify Observers
             let updateOp = NSBlockOperation(block: {
                 self.particleSet = particlesT1 // -> notifyObservers
             })
             NSOperationQueue.mainQueue().addOperation(updateOp)
         })
-        
+        operation.qualityOfService = .UserInitiated
         self.operationQueue.addOperation(operation)
     }
     
     // MARK: MCL algorithm
-    private func mcl(particles_t0: [Particle], motion: MotionModel.MotionData) -> [Particle] {
+    private func mcl(particles_tMinus1: [Particle]) -> [Particle] {
         
-        // integrate motion
-        let particles_t1 = particles_t0.map({particle in Particle(x: particle.x + motion.x, y: particle.y + motion.y, orientation: motion.orientation)})
+        // integrate sample motion
+        // estimated Pose based on MotionModel
+        let mMPoseEstimation_tMinus1 = self.motionModel.lastPoseEstimation()
+        let mMPoseEstimation_t = self.motionModel.computeNewPoseEstimation()
+                
+        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.sampleParticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t)})
         
         // weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
-        weightedParticleSet.reserveCapacity(particles_t1.count)
+        weightedParticleSet.reserveCapacity(samplePoseParticles.count)
         
-        for particle in particles_t1 {
+        for particle in samplePoseParticles {
             var weight: Double = self.measurementModel.weightParticle(particle, withMap: self.map)
             
             if weightedParticleSet.count > 1 {
@@ -127,10 +128,10 @@ class ParticleFilter: NSObject, Observable {
         
         
         // roulette
-        var particles_t2: [Particle] = []
-        particles_t2.reserveCapacity(weightedParticleSet.count)
+        var particles_t: [Particle] = []
+        particles_t.reserveCapacity(weightedParticleSet.count)
         
-        while particles_t2.count < self.particleSetSize {
+        while particles_t.count < self.particleSetSize {
             
             let random = Double(UInt(arc4random_uniform(UInt32(weightedParticleSet.last!.weight))))
             
@@ -144,10 +145,11 @@ class ParticleFilter: NSObject, Observable {
                     break;
                 }
             }
-            particles_t2.append(weightedParticleSet[index].particle)
+            
+            particles_t.append(weightedParticleSet[index].particle)
         }
         
-        return particles_t2
+        return particles_t
     }
     
     // MARK: Particle generation
@@ -161,7 +163,7 @@ class ParticleFilter: NSObject, Observable {
             let particle = generateRandomParticle()
             
             // check if paricle coordinates fit to map
-            if isParticleValid(particle) {
+            if self.map.isCellFree(particle.x, y: particle.y) {
                 particles.append(particle)
             }
             
@@ -171,14 +173,10 @@ class ParticleFilter: NSObject, Observable {
     }
     
     private func generateRandomParticle() -> Particle {
-        let x = UInt(arc4random_uniform(UInt32(self.map.sizeInCm.x)))
-        let y = UInt(arc4random_uniform(UInt32(self.map.sizeInCm.y)))
-        let theta = UInt(arc4random_uniform(360))
-        return Particle(x: x, y: y, orientation: theta)
-    }
-    
-    private func isParticleValid(particle: Particle) -> Bool {
-        return map.isCellFree(Position(x: particle.x, y: particle.y))
+        let x = Double(arc4random_uniform(UInt32(self.map.size.x * 100)))/100.0
+        let y = Double(arc4random_uniform(UInt32(self.map.size.y * 100)))/100.0
+        let theta = Angle.deg2Rad(Double(arc4random_uniform(36000))/100.0)
+        return Particle(x: x, y: y, theta: theta)
     }
     
     

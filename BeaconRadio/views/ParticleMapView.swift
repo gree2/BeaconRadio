@@ -32,14 +32,30 @@ class ParticleMapView: UIView {
                 let particles = dataSource.particlesForParticleMapView(self)
                 let image = drawParticleMapImg(mapImg, particles: particles)
                 
+                
+                let xScale = self.bounds.size.width / image.size.width
+                let yScale = self.bounds.size.height / image.size.height
+                
+                let scale = min(xScale, yScale)
+                
+                let imgSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+                
+                let offsetX = (self.bounds.size.width - imgSize.width) / 2
+                let offsetY = (self.bounds.size.height - imgSize.height) / 2
+                
+                
+                let imgRect = CGRect(origin: CGPoint(x: offsetX, y: offsetY), size: imgSize)
+                
+                
                 let context = UIGraphicsGetCurrentContext()
-                CGContextDrawImage(context, rect, image.CGImage)
+                
+                CGContextDrawImage(context, imgRect, image.CGImage)
             }
         }
     }
     
     // MARK: ParticleMapImg drawing
-    var particleSize: Double = 10.0 {
+    var particleSize: Double = 20.0 {
         didSet {
             if self.particleSize > 0 {
                 self.particleSize = oldValue
@@ -49,7 +65,7 @@ class ParticleMapView: UIView {
     
     private var arrowHeadAngle: Double {
         get {
-            return 90.0
+            return M_PI_2 // = Angle.deg2Rad(90)
         }
     }
     
@@ -71,12 +87,14 @@ class ParticleMapView: UIView {
         
         var particleMapImg = mapImg
         
-        UIGraphicsBeginImageContext(mapImg.size)
+        UIGraphicsBeginImageContext(mapImg.size) // IMPORTANT NOTE: ImageContext -> Point (0,0) in lower left corner!
         mapImg.drawAtPoint(CGPoint.zeroPoint)
         
         for particle in particles {
             if isParticleInRect(particle, rect: CGRect(origin: CGPoint.zeroPoint, size: mapImg.size)) {
                 drawParticle(particle)
+            } else {
+                println("[Warning] ParticleMapView: Particle (\(particle.description())) out of Bounds")
             }
         }
         
@@ -93,16 +111,19 @@ class ParticleMapView: UIView {
         let right = rightPointOfParticleHead(head: head, particle: particle)
         let left = leftPointOfParticleHead(head: head, particle: particle)
         
-        
         return CGRectContainsPoint(rect, tail) && CGRectContainsPoint(rect, head) && CGRectContainsPoint(rect, right) && CGRectContainsPoint(rect, left)
     }
     
     private func drawParticle(particle: Particle) {
         
+
+        
         let tail = pointOfParticleTail(particle)
         let head = centerPointOfParticleHead(particle)
         let right = rightPointOfParticleHead(head: head, particle: particle)
         let left = leftPointOfParticleHead(head: head, particle: particle)
+
+        // DEBUG println("Particle angle: \(Angle.unitCircleRad2CompassDeg(particle.theta)) compassDeg (\(particle.theta) rad)")
         
         // drawing code goes here
         let context = UIGraphicsGetCurrentContext()
@@ -122,69 +143,45 @@ class ParticleMapView: UIView {
     }
     
     private func pointOfParticleTail(particle: Particle) -> CGPoint {
-        let angle: Double = degree2Rad(Double(particle.orientation) + 180.0)
-        let x = Double(particle.x) + sin(angle) * (Double(self.particleSize) * 0.5)
-        let y = Double(particle.y) + cos(angle) * (Double(self.particleSize) * 0.5)
+        let angle = (particle.theta + M_PI) % (2 * M_PI)
         
-        return CGPoint(x: x, y: y)
+        return pointFrom(point: CGPoint(x: particle.x, y: particle.y), withDistance: (self.particleSize * 0.5), andAngle: angle)
     }
     
     private func centerPointOfParticleHead(particle: Particle) -> CGPoint {
-        let angle: Double = degree2Rad(Double(particle.orientation))
-        let x = Double(particle.x) + sin(angle) * (Double(self.particleSize) * 0.5)
-        let y = Double(particle.y) + cos(angle) * (Double(self.particleSize) * 0.5)
-        
-        return CGPoint(x: x, y: y)
+        let angle = particle.theta
+
+        return pointFrom(point: CGPoint(x: particle.x, y: particle.y), withDistance: (self.particleSize * 0.5), andAngle: angle)
     }
     
     private func leftPointOfParticleHead(head point: CGPoint, particle: Particle) -> CGPoint {
-        var angle: Double = (Double(particle.orientation) + self.arrowHeadAngle/2)%360
+        var angle = (particle.theta - self.arrowHeadAngle/2 - M_PI) % (2 * M_PI)
         
         if angle < 0 {
-            angle = 360 + angle
+            angle += 2 * M_PI
         }
         
-        return pointOfParticleArrowHeadForAngle(angle, withHeadCenterPoint: point)
+        return pointFrom(point: point, withDistance: self.arrowHeadSize, andAngle: angle)
     }
     
     private func rightPointOfParticleHead(head point: CGPoint, particle: Particle) -> CGPoint {
-        var angle: Double = (Double(particle.orientation) - self.arrowHeadAngle/2) % 360
+        var angle = (particle.theta + self.arrowHeadAngle/2 + M_PI) % (2 * M_PI)
         
         if angle < 0 {
-            angle = 360 + angle
+            angle += 2 * M_PI
         }
         
-        return pointOfParticleArrowHeadForAngle(angle, withHeadCenterPoint: point)
+        return pointFrom(point: point, withDistance: self.arrowHeadSize, andAngle: angle)
     }
     
-    private func pointOfParticleArrowHeadForAngle(angle: Double, withHeadCenterPoint point: CGPoint) -> CGPoint {
-        let deltaX = abs(self.arrowHeadSize * sin(degree2Rad(angle)))
-        let deltaY = abs(self.arrowHeadSize * cos(degree2Rad(angle)))
+    private func pointFrom(point p: CGPoint, withDistance d: Double, andAngle alpha: Double) -> CGPoint {
+        let deltaX = cos(alpha) * d
+        let deltaY = sin(alpha) * d
         
-        var x: Double
-        var y: Double
+        let x = Double(p.x) + deltaX
+        let y = Double(p.y) + deltaY
         
-        if angle >= 0 && angle < 90 {
-            x = Double(point.x) - deltaX
-            y = Double(point.y) + deltaY
-        } else if angle < 180 {
-            x = Double(point.x) - deltaX
-            y = Double(point.y) - deltaY
-        }
-        else if angle < 270 {
-            x = Double(point.x) + deltaX
-            y = Double(point.y) - deltaY
-        }
-        else {
-            x = Double(point.x) + deltaX
-            y = Double(point.y) + deltaY
-        }
         return CGPoint(x: x, y: y)
-    }
-    
-    private func degree2Rad(deg: Double) -> Double {
-        let angle = (deg + 180 % 360)
-        return -1 * (angle * M_PI / 180.0) % (2 * M_PI)
     }
     
 }
