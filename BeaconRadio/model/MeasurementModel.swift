@@ -8,15 +8,59 @@
 
 import Foundation
 
-class MeasurementModel {
+
+class MeasurementModel: Observer {
+    
+    private var beaconsInRange: [String: Double] = [:]
+    
+    init() {
+        BeaconRadar.sharedInstance.addObserver(self)
+    }
+    
+    deinit {
+        BeaconRadar.sharedInstance.removeObserver(self)
+    }
     
     func weightParticle(particle: Particle, withMap map: Map) -> Double {
         var weight = 0.0
         
         if map.isCellFree(particle.x, y: particle.y) {
             weight = 1.0
+            
+            for bID in self.beaconsInRange.keys {
+                
+                if let lm = map.landmarks[bID] {
+                    let diffX = lm.x - particle.x
+                    let diffY = lm.y - particle.y
+                    
+                    let d = sqrt( (diffX * diffX) + (diffY * diffY) )
+                    let sigma_d_2 = pow(2.0, 2) // /1.0
+                    
+                    weight *= NormalDistribution.pdf(self.beaconsInRange[bID]!, mu: d, sigma_2: sigma_d_2 * d)
+                    
+                    
+//                    let dError = d - self.beaconsInRange[bID]!
+//                    weight *= NormalDistribution.pdf(dError, mu: 0, sigma_2: sigma_d_2)
+                }
+            }
         }
         
+        self.beaconsInRange.removeAll(keepCapacity: true)
+        
         return weight
+    }
+    
+    func update() {
+        var rangedBeacons: [String: Double] = [:]
+        
+        for beacon in BeaconRadar.sharedInstance.getBeacons() {
+            if (beacon.accuracy >= 0) {
+                
+                let id = "\(beacon.proximityUUID.UUIDString):\(beacon.major):\(beacon.minor)"
+                
+                rangedBeacons.updateValue(beacon.accuracy, forKey: id)
+            }
+        }
+        self.beaconsInRange = rangedBeacons
     }
 }

@@ -20,7 +20,7 @@ class ParticleFilter: NSObject, Observable {
         return queue
     }()
     
-    private let particleSetSize = 100
+    private let particleSetSize = 10
     private var particleSet: [Particle] = [] {
         didSet {
             notifyObservers()

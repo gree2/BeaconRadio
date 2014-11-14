@@ -23,13 +23,17 @@ class Map {
             return Size(x: Double(self.mapImg.size.width)/Double(self.scale), y: Double(self.mapImg.size.height)/Double(self.scale))
         }
     }
-    let landmarks: [Landmark]
+    let landmarks: [String: Landmark] = [:]
     
     init (map: UIImage, scale: UInt, orientation: Double, landmarks: [Landmark]) {
         self.mapImg = map;
         self.scale = scale;
         self.mapOrientation = orientation
-        self.landmarks = landmarks
+        
+        for lm in landmarks {
+            self.landmarks.updateValue(lm, forKey: lm.idString)
+        }
+        
     }
     
     func isCellFree(x: Double, y: Double) -> Bool {

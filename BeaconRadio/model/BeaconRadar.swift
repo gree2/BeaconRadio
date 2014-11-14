@@ -79,7 +79,7 @@ class BeaconRadar: NSObject, CLLocationManagerDelegate, Observable {
         beacons.reserveCapacity(self.rangedBeacons.count)
         
         for beacon in self.rangedBeacons.values {
-            beacons.append(beacon)
+            beacons.append(beacon.copy() as CLBeacon)
         }
         return beacons
     }

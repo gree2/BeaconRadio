@@ -35,6 +35,7 @@
 		E09461081A03FAAA0026E002 /* Particle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09461071A03FAAA0026E002 /* Particle.swift */; };
 		E0E8A9651A123141003FC9EE /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E8A9641A123141003FC9EE /* Random.swift */; };
 		E0FCEC0F1A15F1F60035BB35 /* Landmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FCEC0E1A15F1F60035BB35 /* Landmark.swift */; };
+		E0FCEC111A1606980035BB35 /* NormalDistribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FCEC101A1606980035BB35 /* NormalDistribution.swift */; };
 		FAA8A0DDB4263D024491547F /* libPods-BeaconRadio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 096DBBE9DC6CC1E4D7CE2CE3 /* libPods-BeaconRadio.a */; };
 /* End PBXBuildFile section */
 
@@ -106,6 +107,7 @@
 		E09461071A03FAAA0026E002 /* Particle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Particle.swift; sourceTree = "<group>"; };
 		E0E8A9641A123141003FC9EE /* Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
 		E0FCEC0E1A15F1F60035BB35 /* Landmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Landmark.swift; sourceTree = "<group>"; };
+		E0FCEC101A1606980035BB35 /* NormalDistribution.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalDistribution.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +220,7 @@
 				E09460FD1A02850F0026E002 /* UIImage.swift */,
 				E0E8A9641A123141003FC9EE /* Random.swift */,
 				E05551CB1A1365C90073EFAC /* Angle.swift */,
+				E0FCEC101A1606980035BB35 /* NormalDistribution.swift */,
 			);
 			path = util;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				E09461061A03FA5D0026E002 /* ParticleMapView.swift in Sources */,
 				E05551CC1A1365C90073EFAC /* Angle.swift in Sources */,
 				E09460FE1A02850F0026E002 /* UIImage.swift in Sources */,
+				E0FCEC111A1606980035BB35 /* NormalDistribution.swift in Sources */,
 				E015CF981A0B6C3800C4D4F2 /* MotionModel.swift in Sources */,
 				E040635119E70AB000C0A3D0 /* BeaconDetailsViewController.swift in Sources */,
 				E09461001A02AD070026E002 /* ParticleMapViewController.swift in Sources */,
