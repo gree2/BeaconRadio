@@ -34,6 +34,7 @@
 		E09461061A03FA5D0026E002 /* ParticleMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09461051A03FA5D0026E002 /* ParticleMapView.swift */; };
 		E09461081A03FAAA0026E002 /* Particle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09461071A03FAAA0026E002 /* Particle.swift */; };
 		E0E8A9651A123141003FC9EE /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E8A9641A123141003FC9EE /* Random.swift */; };
+		E0FCEC0F1A15F1F60035BB35 /* Landmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FCEC0E1A15F1F60035BB35 /* Landmark.swift */; };
 		FAA8A0DDB4263D024491547F /* libPods-BeaconRadio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 096DBBE9DC6CC1E4D7CE2CE3 /* libPods-BeaconRadio.a */; };
 /* End PBXBuildFile section */
 
@@ -104,6 +105,7 @@
 		E09461051A03FA5D0026E002 /* ParticleMapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticleMapView.swift; sourceTree = "<group>"; };
 		E09461071A03FAAA0026E002 /* Particle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Particle.swift; sourceTree = "<group>"; };
 		E0E8A9641A123141003FC9EE /* Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
+		E0FCEC0E1A15F1F60035BB35 /* Landmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Landmark.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +205,7 @@
 				E015CF971A0B6C3800C4D4F2 /* MotionModel.swift */,
 				E0181F7E1A10CAB8003D9E2D /* MeasurementModel.swift */,
 				E05551CD1A13802C0073EFAC /* Pose.swift */,
+				E0FCEC0E1A15F1F60035BB35 /* Landmark.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -402,6 +405,7 @@
 				E0E8A9651A123141003FC9EE /* Random.swift in Sources */,
 				E037AAA419F949ED00038DBA /* MotionMeasurementController.swift in Sources */,
 				E040633819E549ED00C0A3D0 /* AppDelegate.swift in Sources */,
+				E0FCEC0F1A15F1F60035BB35 /* Landmark.swift in Sources */,
 				E09461061A03FA5D0026E002 /* ParticleMapView.swift in Sources */,
 				E05551CC1A1365C90073EFAC /* Angle.swift in Sources */,
 				E09460FE1A02850F0026E002 /* UIImage.swift in Sources */,

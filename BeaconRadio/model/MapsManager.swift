@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 class MapsManager {
     
@@ -48,6 +49,7 @@ class MapsManager {
         if let directories = dirs {
             let dir = directories[0];
             let mapPath = dir.stringByAppendingPathComponent("maps/\(name).png")
+            var error: Bool = false
             
             if let mapImg = UIImage(contentsOfFile: mapPath) {
                 
@@ -57,13 +59,36 @@ class MapsManager {
                     
                     let scale = plist.valueForKey("scale") as UInt
                     let orientation = plist.valueForKey("orientation") as Double
+                    let lms = plist.valueForKey("landmarks") as [NSDictionary]
                     
                     if scale < 1 || scale > 100 {
+                        error = true
                         println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Scale must be 1 < scale <= 100.")
-                    }else if orientation < 0 || orientation >= 360 {
+                    }
+                    if orientation < 0 || orientation >= 360 {
+                        error = true
                         println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Orientation must be 0 <= orientation < 360.")
-                    } else {
-                        return Map(map: mapImg, scale: scale, orientation: orientation)
+                    }
+                    
+                    var landmarks: [Landmark] = []
+                    
+                    for lm in lms {
+                        let proximityUUID = NSUUID(UUIDString: lm.valueForKey("proximityUUID") as String)
+                        let major = lm.valueForKey("major") as UInt
+                        let minor = lm.valueForKey("minor") as UInt
+                        let x = lm.valueForKey("x") as Double
+                        let y = lm.valueForKey("y") as Double
+                        
+                        if x < 0 || y < 0 {
+                            error = true
+                            println("[ERROR] Couldn't load plist file that corresponds to map named '\(name)'. Reason: Landmark x and/or y must be > 0.")
+                        } else {
+                            landmarks.append(Landmark(uuid: proximityUUID!, major: major, minor: minor, x: x, y: y))
+                        }
+                    }
+                        
+                    if !error {
+                        return Map(map: mapImg, scale: scale, orientation: orientation, landmarks: landmarks)
                     }
                     
                 } else {

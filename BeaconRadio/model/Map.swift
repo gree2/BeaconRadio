@@ -18,14 +18,18 @@ class Map {
     let mapImg: UIImage
     let scale: UInt // 1m = x pixel (1 <= scale <= 100)
     let mapOrientation: Double // degree (0 = North, 90 = East, ...)
-    let size: Size
+    var size: Size {
+        get {
+            return Size(x: Double(self.mapImg.size.width)/Double(self.scale), y: Double(self.mapImg.size.height)/Double(self.scale))
+        }
+    }
+    let landmarks: [Landmark]
     
-    init (map: UIImage, scale: UInt, orientation: Double) {
+    init (map: UIImage, scale: UInt, orientation: Double, landmarks: [Landmark]) {
         self.mapImg = map;
         self.scale = scale;
         self.mapOrientation = orientation
-        
-        self.size = Size(x: Double(self.mapImg.size.width)/Double(self.scale), y: Double(self.mapImg.size.height)/Double(self.scale))
+        self.landmarks = landmarks
     }
     
     func isCellFree(x: Double, y: Double) -> Bool {
