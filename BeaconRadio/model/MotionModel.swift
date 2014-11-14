@@ -301,4 +301,21 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
         
         return Pose(x: x_t, y: y_t, theta: theta_t)
     }
+    
+    /*
+    * @see: Probabilistic Robots, S. Thrun et al, Page 141 (sample_motion_model_with_map)
+    */
+    class func samplePoarticlePoseForPose(p: Pose, withMotionFrom u_tMinus1: Pose, to u_t: Pose, and map: Map) -> Pose {
+        
+        var i = 0
+        var free = false
+        var pose: Pose
+        
+        do {
+            pose = sampleParticlePoseForPose(p, withMotionFrom: u_tMinus1, to: u_t)
+            free = map.isCellFree(pose.x, y: pose.y)
+        } while (!free && i++ <= 10)
+        
+        return pose
+    }
 }

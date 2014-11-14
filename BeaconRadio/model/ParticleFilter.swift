@@ -12,7 +12,7 @@ class ParticleFilter: NSObject, Observable {
     
     let map: Map
     
-    private let runFilterTimeInterval = 20.0
+    private let runFilterTimeInterval = 5.0
     private var runFilterTimer: NSTimer?
     private lazy var operationQueue: NSOperationQueue = {
         let queue = NSOperationQueue()
@@ -90,7 +90,7 @@ class ParticleFilter: NSObject, Observable {
             println("Timer called")
             let particlesT0 = self.particles // copies particleset
             
-            let particlesT1 = self.mcl(particlesT0)
+            let particlesT1 = self.mcl(particlesT0, map: self.map)
 
             // MainThread: set particles and notify Observers
             let updateOp = NSBlockOperation(block: {
@@ -103,14 +103,15 @@ class ParticleFilter: NSObject, Observable {
     }
     
     // MARK: MCL algorithm
-    private func mcl(particles_tMinus1: [Particle]) -> [Particle] {
+    private func mcl(particles_tMinus1: [Particle], map: Map) -> [Particle] {
         
         // integrate sample motion
         // estimated Pose based on MotionModel
         let mMPoseEstimation_tMinus1 = self.motionModel.lastPoseEstimation()
         let mMPoseEstimation_t = self.motionModel.computeNewPoseEstimation()
                 
-        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.sampleParticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t)})
+//        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.sampleParticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t)})
+        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.samplePoarticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t, and: map)})
         
         // weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
@@ -118,12 +119,13 @@ class ParticleFilter: NSObject, Observable {
         
         for particle in samplePoseParticles {
             var weight: Double = self.measurementModel.weightParticle(particle, withMap: self.map)
-            
-            if weightedParticleSet.count > 1 {
-                weight += weightedParticleSet.last!.0 // add weigt of predecessor
+            if weight > 0 {
+                if weightedParticleSet.count > 1 {
+                    weight += weightedParticleSet.last!.0 // add weigt of predecessor
+                }
+                
+                weightedParticleSet += [(weight: weight, particle: particle)]
             }
-            
-            weightedParticleSet += [(weight: weight, particle: particle)]
         }
         
         
