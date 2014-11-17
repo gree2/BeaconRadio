@@ -82,6 +82,19 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         return []
     }
     
+    func estimatedPathForParticleMapView(view: ParticleMapView) -> [Pose] {
+        if let map = self.map {
+            if let particleFilter = self.particleFilter {
+                
+                let poses = particleFilter.estimatedPath()
+                
+                // convert particles to right size
+                return poses.map({p in self.transformParticle(p, ToMapCS: map)})
+            }
+        }
+        return []
+    }
+    
     // from Meters to pixels
     private func transformParticle(p: Particle, ToMapCS map: Map) -> Particle{
         let x = p.x * Double(map.scale)

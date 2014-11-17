@@ -48,9 +48,12 @@ class Random {
     
 
     class func rand_uniform(sigma: Double) -> Double {
-        let decimalDigits: Int = 4
-        let decimalFactor = UInt32(pow(10.0, Double(decimalDigits))*2*sigma)
-        
-        return Double(arc4random_uniform(decimalFactor))/Double(decimalFactor) - sigma
+        if sigma > 0 {
+            let decimalDigits: Int = 4
+            let decimalFactor = UInt32(pow(10.0, Double(decimalDigits))*2*sigma)
+            
+            return Double(arc4random_uniform(decimalFactor))/Double(decimalFactor) - sigma
+        }
+        return 0
     }
 }

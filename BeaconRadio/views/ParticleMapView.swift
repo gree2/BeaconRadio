@@ -30,7 +30,8 @@ class ParticleMapView: UIView {
         if let dataSource = self.dataSource {
             if let mapImg = dataSource.mapImgForParticleMapView(self) {
                 let particles = dataSource.particlesForParticleMapView(self)
-                let image = drawParticleMapImg(mapImg, particles: particles)
+                let path = dataSource.estimatedPathForParticleMapView(self)
+                let image = drawParticleMapImgWith(Map: mapImg, particles: particles, poses: path)
                 
                 
                 let xScale = self.bounds.size.width / image.size.width
@@ -83,19 +84,46 @@ class ParticleMapView: UIView {
         }
     }
     
-    private func drawParticleMapImg(mapImg: UIImage, particles: [Particle]) -> UIImage {
+    private func drawParticleMapImgWith(Map mapImg: UIImage, particles: [Particle], poses: [Pose]) -> UIImage {
         
         var particleMapImg = mapImg
         
         UIGraphicsBeginImageContext(mapImg.size) // IMPORTANT NOTE: ImageContext -> Point (0,0) in lower left corner!
+        
+        // draw map image
         mapImg.drawAtPoint(CGPoint.zeroPoint)
         
+        // draw particles
         for particle in particles {
             if isParticleInRect(particle, rect: CGRect(origin: CGPoint.zeroPoint, size: mapImg.size)) {
                 drawParticle(particle)
             } else {
                 println("[Warning] ParticleMapView: Particle (\(particle.description())) out of Bounds")
             }
+        }
+        
+        // draw estimated path
+        
+        if !poses.isEmpty {
+            let context = UIGraphicsGetCurrentContext()
+            CGContextSetStrokeColorWithColor(context, UIColor.blackColor().CGColor)
+            CGContextSetLineDash(context, 0, [6.0, 5.0], 2)
+            CGContextSetLineWidth(context, CGFloat(self.lineWidth))
+            
+            CGContextBeginPath(context)
+            
+            let first = poses.first!
+            
+            CGContextMoveToPoint(context, CGFloat(first.x), CGFloat(first.y))
+//            CGContextAddEllipseInRect(context, CGRect(x: p.x, y: p.y, width: 10, height: 10))
+            
+            for var i = 1; i < poses.count; ++i {
+                let p = poses[i]
+                CGContextAddLineToPoint(context, CGFloat(p.x), CGFloat(p.y))
+//                CGContextAddEllipseInRect(context, CGRect(x: p.x, y: p.y, width: 10, height: 10))
+            }
+            
+            CGContextDrawPath(context, kCGPathStroke)
         }
         
         particleMapImg = UIGraphicsGetImageFromCurrentImageContext()
@@ -115,8 +143,6 @@ class ParticleMapView: UIView {
     }
     
     private func drawParticle(particle: Particle) {
-        
-
         
         let tail = pointOfParticleTail(particle)
         let head = centerPointOfParticleHead(particle)
@@ -189,4 +215,5 @@ class ParticleMapView: UIView {
 protocol ParticleMapViewDataSource {
     func mapImgForParticleMapView(view: ParticleMapView) -> UIImage?
     func particlesForParticleMapView(view: ParticleMapView) -> [Particle]
+    func estimatedPathForParticleMapView(view: ParticleMapView) -> [Pose]
 }

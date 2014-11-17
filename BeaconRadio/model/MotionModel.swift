@@ -28,12 +28,26 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
 
     
     // TODO: Lock stores
+    private var latestHeading: CLHeading?
     private var headingStore: [CLHeading] = []
+    private var latestPedometerData: CMPedometerData?
     private var pedometerStore: [CMPedometerData] = []
     // TODO: Lock stores
     
     
     private var poseStore: [Pose] = []
+    
+    var estimatedPath: [Pose] {
+        get {
+            var poses: [Pose] = []
+            poses.reserveCapacity(self.poseStore.count)
+            
+            for p in self.poseStore {
+                poses.append(p) // copies struct
+            }
+            return poses
+        }
+    }
 
     typealias Motion = Pose
     
@@ -192,17 +206,49 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
         case 0:
             motion = Motion(x: 0, y: 0, theta: currentHeading())
         case 1:
+            
             let pedometerData = self.pedometerStore.last!
-            motion = computeMotionByIntegratingHeadingIntoDistance(Double(pedometerData.distance), forStartTime: pedometerData.startDate, andEndTime: pedometerData.endDate)
+            var startDate: NSDate
+            
+            if let latest = self.latestPedometerData {
+                startDate = latest.endDate
+            } else {
+                startDate = pedometerData.startDate
+            }
+            
+            motion = computeMotionByIntegratingHeadingIntoDistance(Double(pedometerData.distance), forStartTime: startDate, andEndTime: pedometerData.endDate)
         default:
             
-            for var i = 1; i < self.pedometerStore.count; ++i {
-                let pData_tMinus1 = self.pedometerStore[i-1]
+            for var i = 0; i < self.pedometerStore.count; ++i {
+                
                 let pData_t = self.pedometerStore[i]
                 
-                let distance = Double(pData_t.distance) - Double(pData_tMinus1.distance)
+                var motionPart: Motion
                 
-                let motionPart = computeMotionByIntegratingHeadingIntoDistance(distance, forStartTime: pData_tMinus1.endDate, andEndTime: pData_t.endDate)
+                if i == 0 && self.latestPedometerData != nil {
+                    
+                    let pData_tMinus1:CMPedometerData = self.latestPedometerData!
+                    
+                    motionPart = computeMotionByIntegratingHeadingIntoDistance(
+                        Double(pData_t.distance) - Double(pData_tMinus1.distance),
+                        forStartTime: pData_tMinus1.endDate,
+                        andEndTime: pData_t.endDate)
+                    
+                } else if i == 0 && self.latestPedometerData == nil {
+                    
+                    motionPart = computeMotionByIntegratingHeadingIntoDistance(
+                        Double(pData_t.distance),
+                        forStartTime: pData_t.startDate,
+                        andEndTime: pData_t.endDate)
+                    
+                } else {
+                    
+                    let pData_tMinus1 = self.pedometerStore[i-1]
+                    motionPart = computeMotionByIntegratingHeadingIntoDistance(
+                        Double(pData_t.distance) - Double(pData_tMinus1.distance),
+                        forStartTime: pData_tMinus1.endDate,
+                        andEndTime: pData_t.endDate)
+                }
                 
                 motion = Motion(x: motion.x + motionPart.x, y: motion.y + motionPart.y, theta: motionPart.theta)
             }
@@ -256,56 +302,79 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
         var heading = 0.0
         if let last = self.headingStore.last {
             heading = Angle.compassDeg2UnitCircleRad(last.magneticHeading)
+        } else if let last = self.latestHeading {
+            heading = Angle.compassDeg2UnitCircleRad(last.magneticHeading)
         }
         return heading
     }
     
     private func resetPedometerStore() {
         if let last = self.pedometerStore.last {
+            self.latestPedometerData = last
             self.pedometerStore.removeAll(keepCapacity: true)
-            self.pedometerStore.append(last)
         }
     }
     
     private func resetHeadingStore() {
         if let last = self.headingStore.last {
+            self.latestHeading = last
             self.headingStore.removeAll(keepCapacity: true)
-            self.headingStore.append(last)
         }
     }
     
     
     
     // MARK: Sample Motion Model
-    /*
-    * @see: Probabilistic Robots, S. Thrun et al, Page 136 (sample_motion_model_odometry)
-    */
+    
     class func sampleParticlePoseForPose(p: Pose, withMotionFrom u_tMinus1: Pose, to u_t: Pose) -> Pose {
-        
-        // alpha_1, _2, _3, _4
-        let alpha = [0.1, 0.1, 0.1, 0.1]
-        
         let d_rot_1 = atan2(u_t.y - u_tMinus1.y, u_t.x - u_tMinus1.x) - u_tMinus1.theta
         let d_trans = sqrt( pow((u_tMinus1.x - u_t.x), 2) + pow((u_tMinus1.y - u_t.y), 2) )
-        let d_rot_2 = u_t.theta - u_tMinus1.theta - d_rot_1
+        let d_rot_2 = u_t.theta
+
         
+        let sigma_rot = Angle.deg2Rad(5.0) // degree
+        let sigma_trans = 0.1 * d_trans // m => 1m bei 10m distance, 2m bei 20m distance, ...
+
         
-        let d2_rot_1 = d_rot_1 - Random.sample_normal_distribution(alpha[0] * abs(d_rot_1) + alpha[1] * d_trans)
-        let d2_trans = d_trans - Random.sample_normal_distribution( alpha[2] * d_trans + alpha[3] * (abs(d_rot_1) + abs(d_rot_2)) )
-        let d2_rot_2 = d_rot_2 - Random.sample_normal_distribution( alpha[0] * abs(d_rot_2) + alpha[1] * d_trans )
+        let d2_rot_1 = d_rot_1 - Random.sample_normal_distribution(sigma_rot)
+        let d2_trans = d_trans - Random.sample_normal_distribution(sigma_trans)
+        let d2_rot_2 = d_rot_2 - Random.sample_normal_distribution(sigma_rot)
         
         let x_t = p.x + d2_trans * cos(p.theta + d2_rot_1)
         let y_t = p.y + d2_trans * sin(p.theta + d2_rot_1)
-        let theta_t = p.theta + d2_rot_1 + d2_rot_2
-        
+        let theta_t = d2_rot_2
         
         return Pose(x: x_t, y: y_t, theta: theta_t)
     }
     
     /*
+    * @see: Probabilistic Robots, S. Thrun et al, Page 136 (sample_motion_model_odometry)
+    */
+//    class func sampleParticlePoseForPose(p: Pose, withMotionFrom u_tMinus1: Pose, to u_t: Pose) -> Pose {
+//        
+//        // alpha_1, _2, _3, _4
+//        let alpha = [0.1, 0.1, 0.1, 0.1]
+//        
+//        let d_rot_1 = atan2(u_t.y - u_tMinus1.y, u_t.x - u_tMinus1.x) - u_tMinus1.theta
+//        let d_trans = sqrt( pow((u_tMinus1.x - u_t.x), 2) + pow((u_tMinus1.y - u_t.y), 2) )
+//        let d_rot_2 = u_t.theta - u_tMinus1.theta - d_rot_1
+//        
+//        
+//        let d2_rot_1 = d_rot_1 - Random.sample_normal_distribution(alpha[0] * abs(d_rot_1) + alpha[1] * d_trans)
+//        let d2_trans = d_trans - Random.sample_normal_distribution( alpha[2] * d_trans + alpha[3] * (abs(d_rot_1) + abs(d_rot_2)) )
+//        let d2_rot_2 = d_rot_2 - Random.sample_normal_distribution( alpha[0] * abs(d_rot_2) + alpha[1] * d_trans )
+//        
+//        let x_t = p.x + d2_trans * cos(p.theta + d2_rot_1)
+//        let y_t = p.y + d2_trans * sin(p.theta + d2_rot_1)
+//        let theta_t = p.theta + d2_rot_1 + d2_rot_2
+//        
+//        return Pose(x: x_t, y: y_t, theta: theta_t)
+//    }
+    
+    /*
     * @see: Probabilistic Robots, S. Thrun et al, Page 141 (sample_motion_model_with_map)
     */
-    class func samplePoarticlePoseForPose(p: Pose, withMotionFrom u_tMinus1: Pose, to u_t: Pose, and map: Map) -> Pose {
+    class func sampleParticlePoseForPose(p: Pose, withMotionFrom u_tMinus1: Pose, to u_t: Pose, and map: Map) -> Pose {
         
         var i = 0
         var free = false
@@ -315,6 +384,9 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
             pose = sampleParticlePoseForPose(p, withMotionFrom: u_tMinus1, to: u_t)
             free = map.isCellFree(pose.x, y: pose.y)
         } while (!free && i++ <= 10)
+        
+        //println("Motion: \(u_tMinus1.description())\n-> \(u_t.description())")
+        //println("Pose: \(p.description())\n-> \(pose.description())")
         
         return pose
     }

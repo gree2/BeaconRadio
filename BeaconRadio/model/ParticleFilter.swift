@@ -20,7 +20,7 @@ class ParticleFilter: NSObject, Observable {
         return queue
     }()
     
-    private let particleSetSize = 10
+    private let particleSetSize = 50
     private var particleSet: [Particle] = [] {
         didSet {
             notifyObservers()
@@ -91,6 +91,10 @@ class ParticleFilter: NSObject, Observable {
             let particlesT0 = self.particles // copies particleset
             
             let particlesT1 = self.mcl(particlesT0, map: self.map)
+            
+//            for p in particlesT1 {
+//                println("\(p.description())")
+//            }
 
             // MainThread: set particles and notify Observers
             let updateOp = NSBlockOperation(block: {
@@ -110,8 +114,7 @@ class ParticleFilter: NSObject, Observable {
         let mMPoseEstimation_tMinus1 = self.motionModel.lastPoseEstimation()
         let mMPoseEstimation_t = self.motionModel.computeNewPoseEstimation()
                 
-//        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.sampleParticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t)})
-        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.samplePoarticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t, and: map)})
+        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.sampleParticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t, and: map)})
         
         // weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
@@ -133,25 +136,31 @@ class ParticleFilter: NSObject, Observable {
         var particles_t: [Particle] = []
         particles_t.reserveCapacity(weightedParticleSet.count)
         
-        while particles_t.count < self.particleSetSize {
-            
-            let random = Double(UInt(arc4random_uniform(UInt32(weightedParticleSet.last!.weight))))
-            
-            
-            var index = 0
-            
-            for var i: Int = 0; i < weightedParticleSet.count; ++i {
-                if weightedParticleSet[i].weight < random {
-                    index = i
-                } else {
-                    break;
+        if !weightedParticleSet.isEmpty {
+
+            while particles_t.count < self.particleSetSize {
+                
+                let random = Double(UInt(arc4random_uniform(UInt32(weightedParticleSet.last!.weight))))
+                
+                
+                var index = 0
+                
+                for var i: Int = 0; i < weightedParticleSet.count; ++i {
+                    if weightedParticleSet[i].weight < random {
+                        index = i
+                    } else {
+                        break;
+                    }
                 }
+                
+                particles_t.append(weightedParticleSet[index].particle)
             }
             
-            particles_t.append(weightedParticleSet[index].particle)
+            return particles_t
+        } else {
+            // can happen if all particles are out of bounds
+            return generateParticleSet()
         }
-        
-        return particles_t
     }
     
     // MARK: Particle generation
@@ -179,6 +188,10 @@ class ParticleFilter: NSObject, Observable {
         let y = Double(arc4random_uniform(UInt32(self.map.size.y * 100)))/100.0
         let theta = Angle.deg2Rad(Double(arc4random_uniform(36000))/100.0)
         return Particle(x: x, y: y, theta: theta)
+    }
+    
+    func estimatedPath() -> [Pose] {
+        return self.motionModel.estimatedPath
     }
     
     
