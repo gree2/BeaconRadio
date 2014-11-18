@@ -103,6 +103,7 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
                         
                         let operation = NSBlockOperation(block: {
                             self.pedometerStore.append(data)
+                            Logger.sharedInstance.log(message: data.description)
                         })
                         
                         operationQueue.addOperation(operation)
@@ -116,6 +117,7 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
                         println("[ERROR] CMStepCounter: \(error.description)")
                     } else {
                         // TODO
+                        Logger.sharedInstance.log(message: "CMStepCounter: \(numberOfSteps)")
                     }
                 })
             }
@@ -123,7 +125,7 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
             if CMMotionActivityManager.isActivityAvailable() {
                 self.motionactivity.startActivityUpdatesToQueue(operationQueue, withHandler: {activity in
                     // TODO (activity and confidence)
-                    
+                    Logger.sharedInstance.log(message: activity.description)
                 })
             }
                 
@@ -131,8 +133,8 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
                 if error != nil {
                     println("[ERROR] CMDeviceMotion: \(error.description)")
                 } else {
-                    // TODO
-                    //println("DeviceMotion: \(motion.attitude.description)")
+                    // TODO use attitude instead of heading.
+                    Logger.sharedInstance.log(message: motion.attitude.description)
                 }
                 
             })
@@ -147,12 +149,10 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
     }
     
     func locationManager(manager: CLLocationManager!, didUpdateHeading newHeading: CLHeading!) {
-        // TODO
-        //println("Heading: \(newHeading.description)")
-        
         
         let operation = NSBlockOperation(block: {
             self.headingStore.append(newHeading)
+            Logger.sharedInstance.log(message: newHeading.description)
         })
         if let operationQueue = self.operationQueue {
             operationQueue.addOperation(operation)
