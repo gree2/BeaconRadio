@@ -95,6 +95,13 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         return []
     }
     
+    func landmarkForParticleMapView(view: ParticleMapView) -> [Landmark] {
+        if let map = self.map {
+            return map.landmarks.values.array.map({l in self.transformLandmark(landmark: l, ToMapCS: map)})
+        }
+        return []
+    }
+    
     // from Meters to pixels
     private func transformParticle(p: Particle, ToMapCS map: Map) -> Particle{
         let x = p.x * Double(map.scale)
@@ -102,6 +109,14 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         let theta = Angle.compassDeg2UnitCircleRad( Angle.unitCircleRad2CompassDeg(p.theta) - map.mapOrientation )
         
         return Particle(x: x, y: y, theta: theta)
+    }
+    
+    // from Meters to pixels
+    private func transformLandmark(landmark l: Landmark, ToMapCS map: Map) -> Landmark {
+        let xNew = l.x * Double(map.scale)
+        let yNew = l.y * Double(map.scale)
+        
+        return Landmark(uuid: l.uuid, major: l.major, minor: l.minor, x: xNew, y: yNew)
     }
     
     

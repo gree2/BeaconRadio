@@ -31,7 +31,8 @@ class ParticleMapView: UIView {
             if let mapImg = dataSource.mapImgForParticleMapView(self) {
                 let particles = dataSource.particlesForParticleMapView(self)
                 let path = dataSource.estimatedPathForParticleMapView(self)
-                let image = drawParticleMapImgWith(Map: mapImg, particles: particles, poses: path)
+                let landmarks = dataSource.landmarkForParticleMapView(self)
+                let image = drawParticleMapImgWith(Map: mapImg, particles: particles, poses: path, landmarks: landmarks)
                 
                 
                 let xScale = self.bounds.size.width / image.size.width
@@ -84,7 +85,15 @@ class ParticleMapView: UIView {
         }
     }
     
-    private func drawParticleMapImgWith(Map mapImg: UIImage, particles: [Particle], poses: [Pose]) -> UIImage {
+    var landmarkSize: Double = 10.0 {
+        didSet {
+            if self.particleSize > 0 {
+                self.particleSize = oldValue
+            }
+        }
+    }
+    
+    private func drawParticleMapImgWith(Map mapImg: UIImage, particles: [Particle], poses: [Pose], landmarks: [Landmark]) -> UIImage {
         
         var particleMapImg = mapImg
         
@@ -102,8 +111,20 @@ class ParticleMapView: UIView {
             }
         }
         
-        // draw estimated path
         
+        if !landmarks.isEmpty {
+            let context = UIGraphicsGetCurrentContext()
+            CGContextSetStrokeColorWithColor(context, UIColor.blueColor().CGColor)
+            
+            for l in landmarks {
+                let circleRect = CGRect(x: l.x - self.landmarkSize * 0.5, y: l.y - self.landmarkSize * 0.5, width: self.landmarkSize, height: self.landmarkSize)
+                
+                CGContextFillEllipseInRect(context, circleRect)
+                CGContextStrokeEllipseInRect(context, circleRect)
+            }
+        }
+        
+        // draw estimated path
         if !poses.isEmpty {
             let context = UIGraphicsGetCurrentContext()
             CGContextSetStrokeColorWithColor(context, UIColor.blackColor().CGColor)
@@ -216,4 +237,5 @@ protocol ParticleMapViewDataSource {
     func mapImgForParticleMapView(view: ParticleMapView) -> UIImage?
     func particlesForParticleMapView(view: ParticleMapView) -> [Particle]
     func estimatedPathForParticleMapView(view: ParticleMapView) -> [Pose]
+    func landmarkForParticleMapView(view: ParticleMapView) -> [Landmark]
 }
