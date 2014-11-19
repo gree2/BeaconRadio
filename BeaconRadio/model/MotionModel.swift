@@ -332,13 +332,14 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
         let d_rot_2 = u_t.theta
 
         
-        let sigma_rot = Angle.deg2Rad(5.0) // degree
-        let sigma_trans = 0.1 * d_trans // m => 1m bei 10m distance, 2m bei 20m distance, ...
-
+        let sigma_rot = Angle.deg2Rad(10.0) // degree
+        let sigma_trans = 0.068 * d_trans + 2.1559 // m => 1m bei 10m distance, 2m bei 20m distance, ...
         
         let d2_rot_1 = d_rot_1 - Random.sample_normal_distribution(sigma_rot)
         let d2_trans = d_trans - Random.sample_normal_distribution(sigma_trans)
         let d2_rot_2 = d_rot_2 - Random.sample_normal_distribution(sigma_rot)
+        
+        //println("d_trans: \(d_trans), d2_trans: \(d2_trans)")
         
         let x_t = p.x + d2_trans * cos(p.theta + d2_rot_1)
         let y_t = p.y + d2_trans * sin(p.theta + d2_rot_1)

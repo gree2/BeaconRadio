@@ -50,10 +50,23 @@ class Random {
     class func rand_uniform(sigma: Double) -> Double {
         if sigma > 0 {
             let decimalDigits: Int = 4
-            let decimalFactor = UInt32(pow(10.0, Double(decimalDigits))*2*sigma)
+            let decimalFactor: Double = pow(10.0, Double(decimalDigits))
+            let maxRandom = UInt32(2 * sigma * decimalFactor)
             
-            return Double(arc4random_uniform(decimalFactor))/Double(decimalFactor) - sigma
+            let r = Double(arc4random_uniform(maxRandom))/decimalFactor
+            
+            return  r - sigma
         }
         return 0
+    }
+    
+    // Random varibale [0, 1]
+    class func rand_uniform() -> Double {
+        
+        let decimalDigits: Int = 4
+        let decimalFactor = UInt32(pow(10.0, Double(decimalDigits)))
+        
+        return Double(arc4random_uniform(decimalFactor))/Double(decimalFactor)
+    
     }
 }

@@ -34,13 +34,16 @@ class MeasurementModel: Observer {
                     let diffY = lm.y - particle.y
                     
                     let d = sqrt( (diffX * diffX) + (diffY * diffY) )
-                    let sigma_d_2 = pow(2.0, 2) // /1.0
+                    let sigma_d_2 = pow(0.3131 * d + 0.0051, 2)
                     
-                    weight *= NormalDistribution.pdf(self.beaconsInRange[bID]!, mu: d, sigma_2: sigma_d_2 * d)
+                    let w = NormalDistribution.pdf(self.beaconsInRange[bID]!, mu: d, sigma_2: sigma_d_2)
                     
                     
 //                    let dError = d - self.beaconsInRange[bID]!
-//                    weight *= NormalDistribution.pdf(dError, mu: 0, sigma_2: sigma_d_2)
+//                    let w = NormalDistribution.pdf(dError, mu: 0, sigma_2: sigma_d_2)
+                    weight *= w
+                    
+//                    println("LM: \(bID) -> Distance: \(d), measuredDistance: \(self.beaconsInRange[bID]!), weight: \(w)")
                 }
             }
         }
