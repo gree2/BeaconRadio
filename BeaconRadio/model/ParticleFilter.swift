@@ -12,7 +12,7 @@ class ParticleFilter: NSObject, Observable {
     
     let map: Map
     
-    private let runFilterTimeInterval = 5.0
+    private let runFilterTimeInterval = 1.0
     private var runFilterTimer: NSTimer?
     private lazy var operationQueue: NSOperationQueue = {
         let queue = NSOperationQueue()
@@ -34,11 +34,7 @@ class ParticleFilter: NSObject, Observable {
     var particles: [Particle] {
         get {
             var result: [Particle] = []
-            result.reserveCapacity(self.particleSet.count)
-            for p in self.particleSet {
-                result.append(p)
-            }
-            return result
+            return result + self.particleSet
         }
     }
     
@@ -73,7 +69,7 @@ class ParticleFilter: NSObject, Observable {
     
     private func startTimer() {
         // setup NSTimer
-        runFilterTimer = NSTimer(timeInterval: runFilterTimeInterval, target: self, selector: "filter", userInfo: nil, repeats: true)
+        runFilterTimer = NSTimer(timeInterval: runFilterTimeInterval, target: self, selector: "filter", userInfo: nil, repeats: false)
         NSRunLoop.mainRunLoop().addTimer(runFilterTimer!, forMode: NSRunLoopCommonModes)
     }
     
@@ -87,20 +83,24 @@ class ParticleFilter: NSObject, Observable {
     func filter() {
         
         let operation = NSBlockOperation(block: {
-            println("Timer called")
+            
+            
             let particlesT0 = self.particles // copies particleset
+            let startTime = NSDate()
             
             let particlesT1 = self.mcl(particlesT0, map: self.map)
-            
-//            for p in particlesT1 {
-//                println("\(p.description())")
-//            }
 
+            let endTime = NSDate().timeIntervalSinceDate(startTime)
+            println("ParticleFilter Duration: \(endTime)")
+            
             // MainThread: set particles and notify Observers
             let updateOp = NSBlockOperation(block: {
+                self.startTimer()
                 self.particleSet = particlesT1 // -> notifyObservers
             })
             NSOperationQueue.mainQueue().addOperation(updateOp)
+            
+            
         })
         operation.qualityOfService = .UserInitiated
         self.operationQueue.addOperation(operation)
@@ -115,19 +115,19 @@ class ParticleFilter: NSObject, Observable {
         
         var w_avg: Double = 0.0
         
-        // integrate sample motion
         // estimated Pose based on MotionModel
         let mMPoseEstimation_tMinus1 = self.motionModel.lastPoseEstimation()
         let mMPoseEstimation_t = self.motionModel.computeNewPoseEstimation()
-                
-        let samplePoseParticles = particles_tMinus1.map({p in MotionModel.sampleParticlePoseForPose(p, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t, and: map)})
         
-        // weight particles
+        // Sample motion + weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
-        weightedParticleSet.reserveCapacity(samplePoseParticles.count)
+        weightedParticleSet.reserveCapacity(self.particleSetSize)
         
-        for particle in samplePoseParticles {
-            var w: Double = self.measurementModel.weightParticle(particle, withMap: self.map)
+        for particle in particles_tMinus1 {
+            
+            let sampleParticle = MotionModel.sampleParticlePoseForPose(particle, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t, and: map)
+            
+            var w: Double = self.measurementModel.weightParticle(sampleParticle, withMap: self.map)
             if w > 0 {
                 
                 w_avg += (1.0 / Double(self.particleSetSize)) * w
@@ -136,7 +136,7 @@ class ParticleFilter: NSObject, Observable {
                 if weightedParticleSet.count > 1 {
                     w += weightedParticleSet.last!.0 // add weigt of predecessor
                 }
-                weightedParticleSet += [(weight: w, particle: particle)]
+                weightedParticleSet += [(weight: w, particle: sampleParticle)]
             }
         }
         
@@ -145,7 +145,7 @@ class ParticleFilter: NSObject, Observable {
         
         w_slow += alpha_slow * (w_avg - w_slow)
         w_fast += alpha_fast * (w_avg - w_fast)
-        println("w_avg: \(w_avg), w_slow: \(w_slow), w_fast: \(w_fast), w_fast/w_slow: \(w_fast/w_slow)")
+//        println("w_avg: \(w_avg), w_slow: \(w_slow), w_fast: \(w_fast), w_fast/w_slow: \(w_fast/w_slow)")
         
         // roulette
         var particles_t: [Particle] = []
@@ -182,8 +182,8 @@ class ParticleFilter: NSObject, Observable {
                 
             }
             
-            // println("\(logCount_addedRandomParticleCount) random particles added.")
-            Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
+//            println("\(logCount_addedRandomParticleCount) random particles added.")
+//            Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
             
             return particles_t
         } else {
