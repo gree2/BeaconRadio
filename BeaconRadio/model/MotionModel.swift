@@ -383,7 +383,7 @@ class MotionModel: NSObject, CLLocationManagerDelegate {
         
         do {
             pose = sampleParticlePoseForPose(p, withMotionFrom: u_tMinus1, to: u_t)
-            free = map.isCellFree(pose.x, y: pose.y)
+            free = map.isCellFree(x: pose.x, y: pose.y)
         } while (!free && i++ <= 10)
         
         //println("Motion: \(u_tMinus1.description())\n-> \(u_t.description())")

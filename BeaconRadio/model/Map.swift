@@ -24,6 +24,7 @@ class Map {
         }
     }
     let landmarks: [String: Landmark] = [:]
+    private let pixelData: CFData
     
     init (map: UIImage, scale: UInt, orientation: Double, landmarks: [Landmark]) {
         self.mapImg = map;
@@ -34,20 +35,32 @@ class Map {
             self.landmarks.updateValue(lm, forKey: lm.idString)
         }
         
+        self.pixelData = CGDataProviderCopyData(CGImageGetDataProvider(self.mapImg.CGImage))
+        
     }
     
-    func isCellFree(x: Double, y: Double) -> Bool {
+    func isCellFree(#x: Double, y: Double) -> Bool {
         
-        if 0 <= x && x <= self.size.x && 0 <= y && y <= self.size.y {
-            let color = self.mapImg.getPixelColor(pos2Pixel(x, y: y))
-            let white = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-            return color.isEqual(white) // white
+        let pixel = pos2Pixel(x: x, y: y)
+        
+        if 0 <= pixel.x && pixel.x <= Int(self.mapImg.size.width) && 0 <= pixel.y && pixel.y <= Int(self.mapImg.size.height) {
+            
+            let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
+            
+            let pixelInfo: Int = ((Int(self.mapImg.size.width) * Int(pixel.y)) + Int(pixel.x)) * 4
+            
+            let r = CGFloat(data[pixelInfo])
+            let g = CGFloat(data[pixelInfo+1])
+            let b = CGFloat(data[pixelInfo+2])
+//            let a = CGFloat(data[pixelInfo+3])
+            
+            return (r == 255.0 && g == 255.0 && b == 255.0)
         }
         return false
     }
     
-    private func pos2Pixel(x: Double, y: Double) -> CGPoint {
-        return CGPoint( x: CGFloat(x * Double(self.scale)), y: CGFloat(y * Double(self.scale)) )
+    private func pos2Pixel(#x: Double, y: Double) -> (x: Int, y: Int) {
+        return ( x: Int(x * Double(self.scale)), y: Int(y * Double(self.scale)) )
     }
     
 }

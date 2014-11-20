@@ -217,7 +217,7 @@ class ParticleFilter: NSObject, Observable {
             x = Double(arc4random_uniform(UInt32(self.map.size.x * 100)))/100.0
             y = Double(arc4random_uniform(UInt32(self.map.size.y * 100)))/100.0
             
-        } while !self.map.isCellFree(x, y: y) // check if paricle coordinates fit to map
+        } while !self.map.isCellFree(x: x, y: y) // check if paricle coordinates fit to map
         
         let theta = Angle.deg2Rad(Double(arc4random_uniform(36000))/100.0)
         

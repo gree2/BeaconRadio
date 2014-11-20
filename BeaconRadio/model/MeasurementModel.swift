@@ -24,7 +24,7 @@ class MeasurementModel: Observer {
     func weightParticle(particle: Particle, withMap map: Map) -> Double {
         var weight = 0.0
         
-        if map.isCellFree(particle.x, y: particle.y) {
+        if map.isCellFree(x: particle.x, y: particle.y) {
             weight = 1.0
             
             for bID in self.beaconsInRange.keys {
