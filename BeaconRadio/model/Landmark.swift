@@ -10,7 +10,7 @@ import Foundation
 import CoreLocation
 
 
-typealias Beacon = Landmark
+// typealias Beacon = Landmark
 
 struct Landmark {
     // identifier

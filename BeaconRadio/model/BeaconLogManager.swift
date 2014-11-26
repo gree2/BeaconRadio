@@ -66,9 +66,9 @@ class BeaconLogManager {
         self.logCapacity = capacity
     }
     
-    func addLogEntry(beacon: CLBeacon) {
+    func addLogEntry(beacon: Beacon) {
         
-        let bID = BeaconID(proximityUUID: beacon.proximityUUID, major: beacon.major.integerValue, minor: beacon.minor.integerValue)
+        let bID = BeaconID(proximityUUID: beacon.proximityUUID, major: beacon.major, minor: beacon.minor)
         let logEntry = LogEntry(timestamp: NSDate(), proximity: beacon.proximity, accuracy: beacon.accuracy, rssi: beacon.rssi)
         
         let bIDDescription = bID.description()

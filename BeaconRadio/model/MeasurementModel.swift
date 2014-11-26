@@ -12,13 +12,18 @@ import Foundation
 class MeasurementModel: Observer {
     
     private var beaconsInRange: [String: Double] = [:]
+
     
     init() {
-        BeaconRadar.sharedInstance.addObserver(self)
+        
+    }
+
+    func startBeaconRanging() {
+        BeaconRadarFactory.beaconRadar.addObserver(self)
     }
     
-    deinit {
-        BeaconRadar.sharedInstance.removeObserver(self)
+    func stopBeaconRanging() {
+        BeaconRadarFactory.beaconRadar.removeObserver(self)
     }
     
     func weightParticle(particle: Particle, withMap map: Map) -> Double {
@@ -38,9 +43,6 @@ class MeasurementModel: Observer {
                     
                     let w = NormalDistribution.pdf(self.beaconsInRange[bID]!, mu: d, sigma_2: sigma_d_2)
                     
-                    
-//                    let dError = d - self.beaconsInRange[bID]!
-//                    let w = NormalDistribution.pdf(dError, mu: 0, sigma_2: sigma_d_2)
                     weight *= w
                     
 //                    println("LM: \(bID) -> Distance: \(d), measuredDistance: \(self.beaconsInRange[bID]!), weight: \(w)")
@@ -53,10 +55,12 @@ class MeasurementModel: Observer {
         return weight
     }
     
+    
+    // MARK: Observer protocol
     func update() {
         var rangedBeacons: [String: Double] = [:]
         
-        for beacon in BeaconRadar.sharedInstance.getBeacons() {
+        for beacon in BeaconRadarFactory.beaconRadar.getBeacons() {
             if (beacon.accuracy >= 0) {
                 
                 let id = "\(beacon.proximityUUID.UUIDString):\(beacon.major):\(beacon.minor)"

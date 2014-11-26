@@ -43,7 +43,7 @@ class Map {
         
         let pixel = pos2Pixel(x: x, y: y)
         
-        if 0 <= pixel.x && pixel.x <= Int(self.mapImg.size.width) && 0 <= pixel.y && pixel.y <= Int(self.mapImg.size.height) {
+        if 0 <= pixel.x && pixel.x < Int(self.mapImg.size.width) && 0 <= pixel.y && pixel.y < Int(self.mapImg.size.height) {
             
             let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
             

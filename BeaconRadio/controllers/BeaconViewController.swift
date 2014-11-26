@@ -11,7 +11,7 @@ import UIKit
 
 class BeaconViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, Observer {
     
-    private var beacons = BeaconRadar.sharedInstance.getBeacons()
+    private var beacons = BeaconRadarFactory.beaconRadar.getBeacons()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,13 +20,13 @@ class BeaconViewController: UITableViewController, UITableViewDelegate, UITableV
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         // register observer
-        BeaconRadar.sharedInstance.addObserver(self)
+        BeaconRadarFactory.beaconRadar.addObserver(self)
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         // unregister observer
-        BeaconRadar.sharedInstance.removeObserver(self)
+        BeaconRadarFactory.beaconRadar.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -99,7 +99,7 @@ class BeaconViewController: UITableViewController, UITableViewDelegate, UITableV
     // MARK: Observer protocol
     func update() {
         
-        beacons = BeaconRadar.sharedInstance.getBeacons()
+        beacons = BeaconRadarFactory.beaconRadar.getBeacons()
         self.tableView.reloadData()
     }
     

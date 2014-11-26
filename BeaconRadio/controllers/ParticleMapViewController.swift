@@ -13,6 +13,7 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var particleMapView: ParticleMapView!
     
+    @IBOutlet weak var startStopLocalization: UIBarButtonItem!
     
     private lazy var map:Map? = {
         return MapsManager().loadMap(name: "F007")
@@ -40,8 +41,8 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         
         if let particleFilter = self.particleFilter {
             particleFilter.addObserver(self)
-            particleFilter.startLocalization()
         }
+        
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -56,6 +57,21 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         super.didReceiveMemoryWarning()
     }
     
+    @IBAction func toggleLocalization(sender: UIBarButtonItem) {
+        
+        if let particleFilter = self.particleFilter {
+            
+            if particleFilter.isRunning {
+                particleFilter.removeObserver(self)
+                particleFilter.stopLocalization()
+                self.startStopLocalization.title = "Start"
+            } else {
+                particleFilter.addObserver(self)
+                particleFilter.startLocalization()
+                self.startStopLocalization.title = "Stop"
+            }
+        }
+    }
 
     // MARK: Observer protocol
     func update() {

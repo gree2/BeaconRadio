@@ -21,7 +21,7 @@ class BeaconDetailsViewController: UIViewController, Observer {
     @IBOutlet weak var log2FileItemsLabel: UILabel!
     @IBOutlet weak var log2FileBtn: UIButton!
     
-    var beacon: CLBeacon?
+    var beacon: Beacon?
     private var beaconID: BeaconID?
     
     private let log2fileLogManger = BeaconLogManager()
@@ -39,7 +39,7 @@ class BeaconDetailsViewController: UIViewController, Observer {
         
         if let b = self.beacon {
             
-            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major.integerValue, minor: b.minor.integerValue)
+            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major, minor: b.minor)
             
             uuidLabel.text = b.proximityUUID.UUIDString
             majorLabel.text = "\(b.major)"
@@ -49,13 +49,13 @@ class BeaconDetailsViewController: UIViewController, Observer {
         update()
         
         // register observer
-        BeaconRadar.sharedInstance.addObserver(self)
+        BeaconRadarFactory.beaconRadar.addObserver(self)
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         // unregister observer
-        BeaconRadar.sharedInstance.removeObserver(self)
+        BeaconRadarFactory.beaconRadar.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -73,7 +73,7 @@ class BeaconDetailsViewController: UIViewController, Observer {
     // MARK: Observer protocol
     func update() {
 
-        self.beacon = BeaconRadar.sharedInstance.getBeacon(self.beaconID!)
+        self.beacon = BeaconRadarFactory.beaconRadar.getBeacon(self.beaconID!)
 
         if self.beacon != nil && self.beacon?.proximity != CLProximity.Unknown {
             rssiLabel.text = "\(self.beacon!.rssi) db"

@@ -16,11 +16,11 @@ class ParticleFilter: NSObject, Observable {
     private var runFilterTimer: NSTimer?
     private lazy var operationQueue: NSOperationQueue = {
         let queue = NSOperationQueue()
-        queue.qualityOfService = .Background //.UserInitiated
+        queue.qualityOfService = .UserInitiated
         return queue
     }()
     
-    private let particleSetSize = 50
+    private let particleSetSize = 100
     private var particleSet: [Particle] = [] {
         didSet {
             notifyObservers()
@@ -29,12 +29,17 @@ class ParticleFilter: NSObject, Observable {
     
     private lazy var motionModel = MotionModel()
     private lazy var measurementModel = MeasurementModel()
+    private var _isRunning = false
+    var isRunning: Bool {
+        get {
+            return _isRunning
+        }
+    }
     
     
     var particles: [Particle] {
         get {
-            var result: [Particle] = []
-            return result + self.particleSet
+            return self.particleSet
         }
     }
     
@@ -45,8 +50,11 @@ class ParticleFilter: NSObject, Observable {
     
     func startLocalization() {
         
+        self._isRunning = true
+        
         if self.particleSet.isEmpty {
-            let operation = NSBlockOperation({
+
+            self.operationQueue.addOperationWithBlock({
                 let particles = self.generateParticleSet()
                 
                 // MainThread: set particles and notify Observers
@@ -56,15 +64,14 @@ class ParticleFilter: NSObject, Observable {
                 })
                 NSOperationQueue.mainQueue().addOperation(updateOp)
             })
-            operation.qualityOfService = .UserInitiated
-            self.operationQueue.addOperation(operation)
             
         } else {
             startTimer()
         }
         
         // start MotionTracking
-        self.motionModel.startMotionTracking(self.operationQueue)
+        self.motionModel.startMotionTracking()
+        self.measurementModel.startBeaconRanging()
     }
     
     private func startTimer() {
@@ -74,16 +81,19 @@ class ParticleFilter: NSObject, Observable {
     }
     
     func stopLocalization() {
+        
+        self._isRunning = false
+        
         runFilterTimer?.invalidate()
         runFilterTimer = nil
         
         self.motionModel.stopMotionTracking()
+        self.measurementModel.stopBeaconRanging()
     }
     
     func filter() {
         
-        let operation = NSBlockOperation(block: {
-            
+        self.operationQueue.addOperationWithBlock({
             
             let particlesT0 = self.particles // copies particleset
             let startTime = NSDate()
@@ -100,10 +110,7 @@ class ParticleFilter: NSObject, Observable {
             })
             NSOperationQueue.mainQueue().addOperation(updateOp)
             
-            
         })
-        operation.qualityOfService = .UserInitiated
-        self.operationQueue.addOperation(operation)
     }
     
     // MARK: MCL algorithm
@@ -115,9 +122,9 @@ class ParticleFilter: NSObject, Observable {
         
         var w_avg: Double = 0.0
         
-        // estimated Pose based on MotionModel
-        let mMPoseEstimation_tMinus1 = self.motionModel.lastPoseEstimation()
-        let mMPoseEstimation_t = self.motionModel.computeNewPoseEstimation()
+        // motions
+        let motions = self.motionModel.latestMotions // get copy of motions
+        self.motionModel.resetMotionStore() // delete motions
         
         // Sample motion + weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
@@ -125,7 +132,7 @@ class ParticleFilter: NSObject, Observable {
         
         for particle in particles_tMinus1 {
             
-            let sampleParticle = MotionModel.sampleParticlePoseForPose(particle, withMotionFrom: mMPoseEstimation_tMinus1, to: mMPoseEstimation_t, and: map)
+            let sampleParticle = MotionModel.sampleParticlePoseForPose(particle, withMotions: motions, andMap: map)
             
             var w: Double = self.measurementModel.weightParticle(sampleParticle, withMap: self.map)
             if w > 0 {

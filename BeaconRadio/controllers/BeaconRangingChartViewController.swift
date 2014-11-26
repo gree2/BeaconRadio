@@ -12,7 +12,7 @@ import CoreLocation
 
 class BeaconRangingChartViewController: UIViewController, Observer {
     
-    var beacon: CLBeacon?
+    var beacon: Beacon?
     private var beaconID: BeaconID?
     
     private let beaconLog = BeaconLogManager(capacity: 30)
@@ -30,17 +30,19 @@ class BeaconRangingChartViewController: UIViewController, Observer {
         // register observer
         
         if let b = self.beacon {
-            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major.integerValue, minor: b.minor.integerValue)
+            self.beaconID = BeaconID(proximityUUID: b.proximityUUID, major: b.major, minor: b.minor)
         }
         
         setup()
-        BeaconRadar.sharedInstance.addObserver(self)
+//        BeaconRadar.sharedInstance.addObserver(self)
+        BeaconRadarFactory.beaconRadar.addObserver(self)
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         // unregister observer
-        BeaconRadar.sharedInstance.removeObserver(self)
+  //      BeaconRadar.sharedInstance.removeObserver(self)
+        BeaconRadarFactory.beaconRadar.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -117,7 +119,8 @@ class BeaconRangingChartViewController: UIViewController, Observer {
 
         if let beacon = self.beacon {
 
-            self.beacon = BeaconRadar.sharedInstance.getBeacon(self.beaconID!)
+//            self.beacon = BeaconRadar.sharedInstance.getBeacon(self.beaconID!)
+            self.beacon = BeaconRadarFactory.beaconRadar.getBeacon(self.beaconID!)
             
             if self.beacon != nil && self.beacon?.proximity != CLProximity.Unknown {
                 self.beaconLog.addLogEntry(self.beacon!)
