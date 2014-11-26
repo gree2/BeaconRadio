@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ParticleFilter: NSObject, Observable {
+class ParticleFilter: NSObject, Observable, Observer {
     
     let map: Map
     
@@ -26,6 +26,8 @@ class ParticleFilter: NSObject, Observable {
             notifyObservers()
         }
     }
+    
+    private lazy var beaconRadar: IBeaconRadar = BeaconRadarFactory.beaconRadar
     
     private lazy var motionModel = MotionModel()
     private lazy var measurementModel = MeasurementModel()
@@ -50,28 +52,15 @@ class ParticleFilter: NSObject, Observable {
     
     func startLocalization() {
         
-        self._isRunning = true
-        
-        if self.particleSet.isEmpty {
-
-            self.operationQueue.addOperationWithBlock({
-                let particles = self.generateParticleSet()
-                
-                // MainThread: set particles and notify Observers
-                let updateOp = NSBlockOperation(block: {
-                    self.particleSet = particles
-                    self.startTimer()
-                })
-                NSOperationQueue.mainQueue().addOperation(updateOp)
-            })
-            
-        } else {
-            startTimer()
-        }
-        
         // start MotionTracking
         self.motionModel.startMotionTracking()
         self.measurementModel.startBeaconRanging()
+        
+        // register for beacon updates and wait until first beacons are received
+        // particle generation around beacons
+        self.beaconRadar.addObserver(self)
+        
+        self._isRunning = true
     }
     
     private func startTimer() {
@@ -200,16 +189,37 @@ class ParticleFilter: NSObject, Observable {
     }
     
     // MARK: Particle generation
-    private func generateParticleSet() -> [Particle] {
-        return generateParticleSet(xMin: 0, xMax: self.map.size.x, yMin: 0, yMax: self.map.size.y)
+    
+    private func generateParticlesAroundBeacons(beacons: [Beacon]) -> [Particle] {
+        
+        var particles = [Particle]()
+        
+        for b in beacons {
+            if let landmark = self.map.landmarks[b.identifier] {
+                let xMin = max(0.0, landmark.x - (b.accuracy * 0.5))
+                let xMax = min(self.map.size.x, landmark.x + (b.accuracy * 0.5))
+                
+                let yMin = max(0.0, landmark.y - (b.accuracy * 0.5))
+                let yMax = min(self.map.size.y, landmark.y + (b.accuracy * 0.5))
+                
+                let size:Int = Int(ceil(Double(self.particleSetSize) / Double(beacons.count)))
+                
+                particles += generateParticleSetWithSize(size, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax)
+            }
+        }
+        return particles
     }
     
-    private func generateParticleSet(#xMin: Double, xMax: Double, yMin: Double, yMax: Double) -> [Particle] {
+    private func generateParticleSet() -> [Particle] {
+        return generateParticleSetWithSize(self.particleSetSize, xMin: 0, xMax: self.map.size.x, yMin: 0, yMax: self.map.size.y)
+    }
+    
+    private func generateParticleSetWithSize(size: Int, xMin: Double, xMax: Double, yMin: Double, yMax: Double) -> [Particle] {
         
         var particles: [Particle] = []
         
         if 0 <= xMin && xMin < xMax && 0 <= yMin && yMin < yMax {
-            while particles.count < self.particleSetSize {
+            while particles.count < size {
                 
                 // add random particle
                 particles.append(generateRandomParticle(xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax))
@@ -245,6 +255,23 @@ class ParticleFilter: NSObject, Observable {
         return self.motionModel.estimatedPath
     }
     
+    
+    // MARK: Observer protocol - BeaconRadio
+    func update() {
+        // get Beacons ordered by accuracy ascending
+        
+        let beacons = self.beaconRadar.getBeacons().sorted({$0.accuracy < $1.accuracy})
+        
+        let particles = generateParticlesAroundBeacons(beacons)
+        
+        if self.particleSet.isEmpty && !particles.isEmpty {
+            self.beaconRadar.removeObserver(self)
+            self.particleSet = particles
+        } else {
+            self.beaconRadar.removeObserver(self)
+        }
+        startTimer()
+    }
     
     // MARK: Observable protocol
     private var observers = NSMutableSet()
