@@ -232,7 +232,7 @@ class ParticleFilter: NSObject, Observable {
         do {
             
             x = Double(arc4random_uniform(UInt32( (xMax-xMin) * 100)))/100.0 + xMin
-            y = Double(arc4random_uniform(UInt32( (yMax-xMin) * 100)))/100.0 + yMin
+            y = Double(arc4random_uniform(UInt32( (yMax-yMin) * 100)))/100.0 + yMin
             
         } while !self.map.isCellFree(x: x, y: y) // check if paricle coordinates fit to map
         
