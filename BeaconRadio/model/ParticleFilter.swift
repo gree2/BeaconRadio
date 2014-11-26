@@ -201,13 +201,19 @@ class ParticleFilter: NSObject, Observable {
     
     // MARK: Particle generation
     private func generateParticleSet() -> [Particle] {
+        return generateParticleSet(xMin: 0, xMax: self.map.size.x, yMin: 0, yMax: self.map.size.y)
+    }
+    
+    private func generateParticleSet(#xMin: Double, xMax: Double, yMin: Double, yMax: Double) -> [Particle] {
         
         var particles: [Particle] = []
         
-        while particles.count < self.particleSetSize {
-            
-            // add random particle
-            particles.append(generateRandomParticle())
+        if 0 <= xMin && xMin < xMax && 0 <= yMin && yMin < yMax {
+            while particles.count < self.particleSetSize {
+                
+                // add random particle
+                particles.append(generateRandomParticle(xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax))
+            }
         }
         
         return particles
@@ -215,14 +221,18 @@ class ParticleFilter: NSObject, Observable {
     
     // returns particle that fits to the map's free space
     private func generateRandomParticle() -> Particle {
+        return generateRandomParticle(xMin: 0, xMax: self.map.size.x, yMin: 0, yMax: self.map.size.y)
+    }
+    
+    private func generateRandomParticle(#xMin: Double, xMax: Double, yMin: Double, yMax: Double) -> Particle {
         
         var x = 0.0
         var y = 0.0
         
         do {
             
-            x = Double(arc4random_uniform(UInt32(self.map.size.x * 100)))/100.0
-            y = Double(arc4random_uniform(UInt32(self.map.size.y * 100)))/100.0
+            x = Double(arc4random_uniform(UInt32( (xMax-xMin) * 100)))/100.0 + xMin
+            y = Double(arc4random_uniform(UInt32( (yMax-xMin) * 100)))/100.0 + yMin
             
         } while !self.map.isCellFree(x: x, y: y) // check if paricle coordinates fit to map
         
