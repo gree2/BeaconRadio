@@ -112,7 +112,10 @@ class MotionModel: MotionTrackerDelegate {
             if let last = self.poseStore.last {
                 return last
             } else {
-                return Pose(x: 0, y: 0, theta: currentHeading())
+                let p = Pose(x: 1.5, y: 2.0, theta: 0)
+                self.poseStore.append(p)
+                
+                return p
             }
         }
     }
@@ -149,6 +152,11 @@ class MotionModel: MotionTrackerDelegate {
     private func computeMotionsByIntegratingHeadingIntoDistance(distance: Double, forStartTime start: NSDate, andEndTime end: NSDate) -> [Motion] {
         
         let headings = self.headingStore.filter({h in (h.timestamp.compare(start) != NSComparisonResult.OrderedAscending && h.timestamp.compare(end) != NSComparisonResult.OrderedDescending)})
+        //FIXME headings filter
+        
+//        if let first = headings.first {
+//            if first.timestamp.compare(start) == NSComparisonResult.OrderedDescending && // suche heading davor und setzte startdate auf start
+//        }
         
         let totalDuration = end.timeIntervalSinceDate(start)
         
@@ -163,8 +171,20 @@ class MotionModel: MotionTrackerDelegate {
         }
         
         // implicit else-Block
-        for heading in headings {
-            let headingDuration = heading.timestamp.timeIntervalSinceDate(start)
+        for (index, heading) in enumerate(headings) {
+            
+            var headingDuration = 0.0
+            
+            if index == 0 && headings.count > 1 { // first heading use start date and next heading
+                headingDuration = headings[index+1].timestamp.timeIntervalSinceDate(start)
+            } else if index == 0 && headings.count == 1 { // the only heading for distance
+                headingDuration = end.timeIntervalSinceDate(start)
+            } else if index > 0 && headings.count > index+1 { // successor: yes
+                headingDuration = headings[index+1].timestamp.timeIntervalSinceDate(heading.timestamp)
+            } else if index > 0 { // successor: no
+                headingDuration = end.timeIntervalSinceDate(heading.timestamp)
+            }
+            
             let magneticHeading = heading.heading
             
             motions.append(computeMotionWithHeading(magneticHeading, distance: distance, headingDuration: headingDuration, totalDuration: totalDuration))
@@ -176,8 +196,8 @@ class MotionModel: MotionTrackerDelegate {
     }
     
     private func computeMotionWithHeading(heading: Double, distance: Double, headingDuration: NSTimeInterval, totalDuration: NSTimeInterval) -> Motion {
-        
-        return Motion(heading: heading, distance: distance * headingDuration/totalDuration)
+        let d = distance * headingDuration/totalDuration
+        return Motion(heading: heading, distance: d)
     }
     
     private func currentHeading() -> Double {
