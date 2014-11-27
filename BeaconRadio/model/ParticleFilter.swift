@@ -20,7 +20,7 @@ class ParticleFilter: NSObject, Observable, Observer {
         return queue
     }()
     
-    private let particleSetSize = 100
+    private let particleSetSize = 200
     private var particleSet: [Particle] = [] {
         didSet {
             notifyObservers()
@@ -42,6 +42,14 @@ class ParticleFilter: NSObject, Observable, Observer {
     var particles: [Particle] {
         get {
             return self.particleSet
+        }
+    }
+    
+    var particleSetMean: (x: Double, y: Double) {
+        get {
+            let x = self.particleSet.reduce(0.0, combine: {$0 + $1.x})/Double(self.particleSetSize)
+            let y = self.particleSet.reduce(0.0, combine: {$0 + $1.y})/Double(self.particleSetSize)
+            return (x: x, y: y)
         }
     }
     
@@ -172,7 +180,6 @@ class ParticleFilter: NSObject, Observable, Observer {
                             break;
                         }
                     }
-                    
                     particles_t.append(weightedParticleSet[index].particle)
                 }
                 

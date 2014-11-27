@@ -118,6 +118,15 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         return []
     }
     
+    func particleSetMeanForParticleMapVIew(view: ParticleMapView) -> (x: Double, y: Double) {
+        if let map = self.map {
+            if let particleFilter = self.particleFilter {
+                return transformPose(particleFilter.particleSetMean, ToMapCS: map)
+            }
+        }
+        return (x: -1, y: -1)
+    }
+    
     // from Meters to pixels
     private func transformParticle(p: Particle, ToMapCS map: Map) -> Particle{
         let x = p.x * Double(map.scale)
@@ -133,6 +142,10 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         let yNew = l.y * Double(map.scale)
         
         return Landmark(uuid: l.uuid, major: l.major, minor: l.minor, x: xNew, y: yNew)
+    }
+    
+    private func transformPose(p: (x:Double, y: Double), ToMapCS map: Map) -> (x: Double, y: Double) {
+        return (x: p.x * Double(map.scale), y: p.y * Double(map.scale))
     }
     
     

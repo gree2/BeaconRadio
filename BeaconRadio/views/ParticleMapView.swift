@@ -30,9 +30,10 @@ class ParticleMapView: UIView {
         if let dataSource = self.dataSource {
             if let mapImg = dataSource.mapImgForParticleMapView(self) {
                 let particles = dataSource.particlesForParticleMapView(self)
+                let mean = dataSource.particleSetMeanForParticleMapVIew(self)
                 let path = dataSource.estimatedPathForParticleMapView(self)
                 let landmarks = dataSource.landmarkForParticleMapView(self)
-                let image = drawParticleMapImgWith(Map: mapImg, particles: particles, poses: path, landmarks: landmarks)
+                let image = drawParticleMapImgWith(Map: mapImg, particles: particles, mean: mean, poses: path, landmarks: landmarks)
                 
                 
                 let xScale = self.bounds.size.width / image.size.width
@@ -87,13 +88,21 @@ class ParticleMapView: UIView {
     
     var landmarkSize: Double = 10.0 {
         didSet {
-            if self.particleSize > 0 {
-                self.particleSize = oldValue
+            if self.landmarkSize > 0 {
+                self.landmarkSize = oldValue
             }
         }
     }
     
-    private func drawParticleMapImgWith(Map mapImg: UIImage, particles: [Particle], poses: [Pose], landmarks: [Landmark]) -> UIImage {
+    var particleSetMeanSize: Double = 15.0 {
+        didSet {
+            if self.particleSetMeanSize > 0 {
+                self.particleSetMeanSize = oldValue
+            }
+        }
+    }
+    
+    private func drawParticleMapImgWith(Map mapImg: UIImage, particles: [Particle], mean: (x: Double, y:Double), poses: [Pose], landmarks: [Landmark]) -> UIImage {
         
         var particleMapImg = mapImg
         
@@ -111,16 +120,24 @@ class ParticleMapView: UIView {
             }
         }
         
+        // draw particle set mean
+        if mean.x >= 0 && mean.y >= 0 {
+            let ctx = UIGraphicsGetCurrentContext()
+            CGContextSetFillColorWithColor(ctx, UIColor.redColor().CGColor)
+            
+            let circleRect = CGRect(x: mean.x - self.particleSetMeanSize * 0.5, y: mean.y - self.particleSetMeanSize * 0.5, width: self.particleSetMeanSize, height: self.particleSetMeanSize)
+            CGContextFillEllipseInRect(ctx, circleRect)
+        }
         
+        // draw landmarks
         if !landmarks.isEmpty {
             let context = UIGraphicsGetCurrentContext()
-            CGContextSetStrokeColorWithColor(context, UIColor.blueColor().CGColor)
+            CGContextSetFillColorWithColor(context, UIColor.blueColor().CGColor)
             
             for l in landmarks {
                 let circleRect = CGRect(x: l.x - self.landmarkSize * 0.5, y: l.y - self.landmarkSize * 0.5, width: self.landmarkSize, height: self.landmarkSize)
                 
                 CGContextFillEllipseInRect(context, circleRect)
-                CGContextStrokeEllipseInRect(context, circleRect)
             }
         }
         
@@ -136,12 +153,10 @@ class ParticleMapView: UIView {
             let first = poses.first!
             
             CGContextMoveToPoint(context, CGFloat(first.x), CGFloat(first.y))
-//            CGContextAddEllipseInRect(context, CGRect(x: p.x, y: p.y, width: 10, height: 10))
             
             for var i = 1; i < poses.count; ++i {
                 let p = poses[i]
                 CGContextAddLineToPoint(context, CGFloat(p.x), CGFloat(p.y))
-//                CGContextAddEllipseInRect(context, CGRect(x: p.x, y: p.y, width: 10, height: 10))
             }
             
             CGContextDrawPath(context, kCGPathStroke)
@@ -238,4 +253,5 @@ protocol ParticleMapViewDataSource {
     func particlesForParticleMapView(view: ParticleMapView) -> [Particle]
     func estimatedPathForParticleMapView(view: ParticleMapView) -> [Pose]
     func landmarkForParticleMapView(view: ParticleMapView) -> [Landmark]
+    func particleSetMeanForParticleMapVIew(view: ParticleMapView) -> (x: Double, y: Double)
 }
