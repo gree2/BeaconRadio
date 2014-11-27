@@ -48,37 +48,39 @@ class MotionModel: MotionTrackerDelegate {
     // MARK: Sample Motion Model
     class func sampleParticlePoseForPose(p: Pose, withMotions u: [Motion], andMap m: Map) -> Pose {
         
-        var i = 0
-        var pose: Pose
+        var pose: Pose = p
         
-        do {
-            var xDiff = 0.0
-            var yDiff = 0.0
+        if !u.isEmpty {
+            var i = 0
             
-            var h = 0.0
-            
-            for u_t in u {
-                let sigma_rot = Angle.deg2Rad(10.0) // degree
-                let sigma_trans = 0.068 * u_t.distance + 2.1559 // FIXME: 2.1559 too big!!! Do distance measurement also for 5m.
+            do {
+                var xDiff = 0.0
+                var yDiff = 0.0
                 
-                h = u_t.heading - Random.sample_normal_distribution(sigma_rot)
-                let d = u_t.distance - Random.sample_normal_distribution(sigma_trans)
+                var h = 0.0
                 
-                xDiff += cos(h) * d
-                yDiff += sin(h) * d
-            }
-            
-            pose = Pose(x: p.x + xDiff, y: p.y + yDiff, theta: h)
-
-        } while (!m.isCellFree(x: pose.x, y: pose.y) && i++ < 5)
-        
+                for u_t in u {
+                    let sigma_rot = Angle.deg2Rad(10.0) // degree
+                    let sigma_trans = 0.0971 * u_t.distance + 1.445 //0.068 * u_t.distance + 2.1559
+                    
+                    h = u_t.heading - Random.sample_normal_distribution(sigma_rot)
+                    let d = u_t.distance - Random.sample_normal_distribution(sigma_trans)
+                    
+                    xDiff += cos(h) * d
+                    yDiff += sin(h) * d
+                }
+                
+                pose = Pose(x: p.x + xDiff, y: p.y + yDiff, theta: h)
+                
+            } while (!m.isCellFree(x: pose.x, y: pose.y) && i++ < 5)
+        }
         
         return pose
     }
     
     var latestMotions: [Motion] {
         get {
-            return self.motionStore + [Motion(heading: self.currentHeading(), distance: 0.0)] // adds current heading => particle moves if motionStore isEmpty
+            return self.motionStore// + [Motion(heading: self.currentHeading(), distance: 0.0)] // adds current heading => particle moves if motionStore isEmpty
         }
     }
     
