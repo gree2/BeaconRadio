@@ -114,7 +114,7 @@ class MotionModel: MotionTrackerDelegate {
             if let last = self.poseStore.last {
                 return last
             } else {
-                let p = Pose(x: 1.5, y: 2.0, theta: 0)
+                let p = Pose(x: 1.5, y: 2.0, theta: Angle.compassDeg2UnitCircleRad(125.0))
                 self.poseStore.append(p)
                 
                 return p
