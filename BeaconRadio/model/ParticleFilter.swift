@@ -195,7 +195,9 @@ class ParticleFilter: NSObject, Observable, Observer {
                     ++logCount_addedRandomParticleCount
                 } else {
                     // draw particle with probability
-                    let random = Double(UInt(arc4random_uniform(UInt32(weightedParticleSet.last!.weight))))
+                    let random = Random.rand_uniform() * weightedParticleSet.last!.weight
+                    
+                    // loop
 //                    var index = 0
 //                    
 //                    for var i: Int = 0; i < weightedParticleSet.count; ++i {
@@ -205,6 +207,7 @@ class ParticleFilter: NSObject, Observable, Observer {
 //                            break;
 //                        }
 //                    }
+                    
                     // binary search
                     var m: Int = 0;
                     var left: Int = 0;

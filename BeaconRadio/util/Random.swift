@@ -63,7 +63,7 @@ class Random {
     // Random varibale [0, 1]
     class func rand_uniform() -> Double {
         
-        let decimalDigits: Int = 4
+        let decimalDigits: Int = 9
         let decimalFactor = UInt32(pow(10.0, Double(decimalDigits)))
         
         return Double(arc4random_uniform(decimalFactor))/Double(decimalFactor)
