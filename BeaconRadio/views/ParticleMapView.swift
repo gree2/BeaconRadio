@@ -130,9 +130,6 @@ class ParticleMapView: UIView {
 //            CGContextFillEllipseInRect(ctx, circleRect)
 //        }
         
-        // draw motion path
-        self.drawPath(motionPath, withColor: UIColor.blackColor())
-        
         // draw landmarks
         if !landmarks.isEmpty {
             let context = UIGraphicsGetCurrentContext()
@@ -145,10 +142,11 @@ class ParticleMapView: UIView {
             }
         }
         
+        // draw motion path
+        self.drawPath(motionPath, withColor: UIColor.blackColor())
+        
         // draw estimated path
         self.drawPath(path, withColor: UIColor.greenColor())
-        
-        
         
         particleMapImg = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()

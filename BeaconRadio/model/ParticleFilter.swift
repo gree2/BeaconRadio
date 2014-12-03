@@ -235,7 +235,7 @@ class ParticleFilter: NSObject, Observable, Observer {
             }
         
             self.weightedParticleSetMean = (x: weightedParticleSetMean.x/weightSum, y: weightedParticleSetMean.y/weightSum)
-            self.estimatedPath.append(Pose(x: weightedParticleSetMean.x, y: weightedParticleSetMean.y, theta: 0.0))
+            self.estimatedPath.append(Pose(x: self.weightedParticleSetMean.x, y: self.weightedParticleSetMean.y, theta: 0.0))
             
             //println("\(logCount_addedRandomParticleCount) random particles added.")
             Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
