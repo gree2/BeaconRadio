@@ -168,6 +168,10 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
         })
     }
     
+    func locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager!) -> Bool {
+        return true
+    }
+    
     func stopMotionTracking() {
         if isTracking {
             self.pedometer.stopPedometerUpdates()
