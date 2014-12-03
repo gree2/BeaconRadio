@@ -9,7 +9,7 @@
 import Foundation
 
 class NormalDistribution {
-    class func pdf(x: Double, mu: Double, sigma_2: Double) -> Double {
-        return ( 1 / sqrt(2 * M_PI * sigma_2) ) * exp(-0.5 * pow((x-mu), 2) / sigma_2)
+    class func pdf(x: Double, mu: Double, sigma: Double) -> Double {
+        return ( 1 / (sqrt(2 * M_PI) * sigma) ) * exp(-0.5 * pow((x-mu), 2) / (sigma * sigma))
     }
 }

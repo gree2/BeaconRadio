@@ -14,6 +14,12 @@ class MeasurementModel: Observer {
     private var beaconsInRange: [String: Double] = [:]
 
     
+    var measurements: [String: Double] {
+        get {
+            return self.beaconsInRange
+        }
+    }
+    
     init() {
         
     }
@@ -26,22 +32,25 @@ class MeasurementModel: Observer {
         BeaconRadarFactory.beaconRadar.removeObserver(self)
     }
     
-    func weightParticle(particle: Particle, withMap map: Map) -> Double {
+    class func weightParticle(particle: Particle, withDistanceMeasurements beaconsInRange: [String: Double],  andMap map: Map) -> Double {
         var weight = 0.0
         
         if map.isCellFree(x: particle.x, y: particle.y) {
             weight = 1.0
             
-            for bID in self.beaconsInRange.keys {
+            for bID in beaconsInRange.keys {
                 
                 if let lm = map.landmarks[bID] {
                     let diffX = lm.x - particle.x
                     let diffY = lm.y - particle.y
                     
                     let d = sqrt( (diffX * diffX) + (diffY * diffY) )
-                    let sigma_d_2 = pow(0.3131 * d + 0.0051, 2)
+                    let sigma_d = max(0.3131 * d + 0.0051, 0.5) // standard deviation
+//                    let sigma_d_2 = pow(sigma_d, 2) // variance
                     
-                    let w = NormalDistribution.pdf(self.beaconsInRange[bID]!, mu: d, sigma_2: sigma_d_2)
+                    let d_measurment = beaconsInRange[bID]!
+                    
+                    let w = NormalDistribution.pdf(d_measurment, mu: d, sigma: sigma_d)
                     
                     weight *= w
                     
@@ -50,11 +59,14 @@ class MeasurementModel: Observer {
             }
         }
         
-        self.beaconsInRange.removeAll(keepCapacity: true)
+        
         
         return weight
     }
     
+    func resetMeasurementStore() {
+        self.beaconsInRange.removeAll(keepCapacity: true)
+    }
     
     // MARK: Observer protocol
     func update() {

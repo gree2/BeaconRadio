@@ -102,7 +102,20 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         if let map = self.map {
             if let particleFilter = self.particleFilter {
                 
-                let poses = particleFilter.estimatedPath()
+                let poses = particleFilter.estimatedPath
+                
+                // convert particles to right size
+                return poses.map({p in self.transformParticle(p, ToMapCS: map)})
+            }
+        }
+        return []
+    }
+    
+    func estimatedMotionPathForParticleMapView(view: ParticleMapView) -> [Pose] {
+        if let map = self.map {
+            if let particleFilter = self.particleFilter {
+                
+                let poses = particleFilter.motionPath
                 
                 // convert particles to right size
                 return poses.map({p in self.transformParticle(p, ToMapCS: map)})
@@ -118,7 +131,7 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
         return []
     }
     
-    func particleSetMeanForParticleMapVIew(view: ParticleMapView) -> (x: Double, y: Double) {
+    func particleSetMeanForParticleMapView(view: ParticleMapView) -> (x: Double, y: Double) {
         if let map = self.map {
             if let particleFilter = self.particleFilter {
                 return transformPose(particleFilter.particleSetMean, ToMapCS: map)

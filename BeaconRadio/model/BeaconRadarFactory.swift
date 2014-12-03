@@ -15,7 +15,7 @@ class BeaconRadarFactory {
         struct Static {
             static var instance: IBeaconRadar?
             static var token: dispatch_once_t = 0
-            static let simulation = true
+            static let simulation = false
         }
         dispatch_once(&Static.token) {
             
