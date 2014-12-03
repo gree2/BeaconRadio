@@ -109,7 +109,7 @@ class ParticleFilter: NSObject, Observable, Observer {
             let particlesT1 = self.mcl(particlesT0, map: self.map)
 
             let endTime = NSDate().timeIntervalSinceDate(startTime)
-            println("ParticleFilter Duration: \(endTime)")
+            //println("ParticleFilter Duration: \(endTime)")
             
             // MainThread: set particles and notify Observers
             let updateOp = NSBlockOperation(block: {
@@ -171,7 +171,7 @@ class ParticleFilter: NSObject, Observable, Observer {
         
         w_slow += alpha_slow * (w_avg - w_slow)
         w_fast += alpha_fast * (w_avg - w_fast)
-        println("w_avg: \(w_avg), w_slow: \(w_slow), w_fast: \(w_fast), w_fast/w_slow: \(w_fast/w_slow)")
+        //println("w_avg: \(w_avg), w_slow: \(w_slow), w_fast: \(w_fast), w_fast/w_slow: \(w_fast/w_slow)")
         
         var weightedParticleSetMean: (x: Double, y: Double) = (0.0, 0.0)
         var weightSum = 0.0
@@ -198,16 +198,16 @@ class ParticleFilter: NSObject, Observable, Observer {
                     let random = Random.rand_uniform() * weightedParticleSet.last!.weight
                     
                     // loop
-//                    var index = 0
-//                    
-//                    for var i: Int = 0; i < weightedParticleSet.count; ++i {
-//                        if weightedParticleSet[i].weight < random {
-//                            index = i
-//                        } else {
-//                            break;
-//                        }
-//                    }
+/*                    var index = 0
                     
+                    for var i: Int = 0; i < weightedParticleSet.count; ++i {
+                        if weightedParticleSet[i].weight < random {
+                            index = i
+                        } else {
+                            break;
+                        }
+                    }
+*/
                     // binary search
                     var m: Int = 0;
                     var left: Int = 0;
@@ -240,7 +240,7 @@ class ParticleFilter: NSObject, Observable, Observer {
             self.weightedParticleSetMean = (x: weightedParticleSetMean.x/weightSum, y: weightedParticleSetMean.y/weightSum)
             self.estimatedPath.append(Pose(x: self.weightedParticleSetMean.x, y: self.weightedParticleSetMean.y, theta: 0.0))
             
-            //println("\(logCount_addedRandomParticleCount) random particles added.")
+            println("\(logCount_addedRandomParticleCount) random particles added.")
             Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
         
             return particles_t
