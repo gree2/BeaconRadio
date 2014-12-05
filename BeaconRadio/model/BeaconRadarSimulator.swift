@@ -44,7 +44,7 @@ class BeaconRadarSimulator: IBeaconRadar, DataPlayerDelegate {
     private func start() {
         isRanging = true
         
-        self.dataPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-11-25_15-34-12_Beacon.csv")! , error: nil)
+        self.dataPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-03_16-23_Beacon.csv")! , error: nil)
         self.dataPlayer.playback(self)
     }
     

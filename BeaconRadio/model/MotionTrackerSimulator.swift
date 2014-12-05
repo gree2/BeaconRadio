@@ -24,8 +24,8 @@ class MotionTrackerSimulator: IMotionTracker, DataPlayerDelegate {
     func startMotionTracking(delegate: MotionTrackerDelegate) {
         self.delegate = delegate
         
-        self.headingPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-11-25_15-34-12_Heading.csv")!, error: nil)
-        self.pedometerPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-11-25_15-34-12_Pedometer.csv")!, error: nil)
+        self.headingPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-03_16-23_Heading.csv")!, error: nil)
+        self.pedometerPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-03_16-23_Pedometer.csv")!, error: nil)
         
         self.headingPlayer.playback(self)
         self.pedometerPlayer.playback(self)
