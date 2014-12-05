@@ -87,14 +87,6 @@ class ParticleMapView: UIView {
         }
     }
     
-    var landmarkSize: Double = 10.0 {
-        didSet {
-            if self.landmarkSize > 0 {
-                self.landmarkSize = oldValue
-            }
-        }
-    }
-    
     var pointSize: Double = 15.0 {
         didSet {
             if self.pointSize > 0 {
@@ -122,22 +114,15 @@ class ParticleMapView: UIView {
         }
         
         // draw landmarks
-        if !landmarks.isEmpty {
-            let context = UIGraphicsGetCurrentContext()
-            CGContextSetFillColorWithColor(context, UIColor.blueColor().CGColor)
-            
-            for l in landmarks {
-                let circleRect = CGRect(x: l.x - self.landmarkSize * 0.5, y: l.y - self.landmarkSize * 0.5, width: self.landmarkSize, height: self.landmarkSize)
-                
-                CGContextFillEllipseInRect(context, circleRect)
-            }
+        for l in landmarks {
+            drawPoint(CGPoint(x: l.x, y: l.y), withColor: UIColor.blueColor())
         }
         
         // draw motion path
         self.drawPath(motionPath, withColor: UIColor.blackColor())
         
         // draw estimated path
-        self.drawPath(path, withColor: UIColor.greenColor())
+        self.drawPath(path, withColor: UIColor.blueColor())
         
         particleMapImg = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -243,7 +228,7 @@ class ParticleMapView: UIView {
             }
             
             CGContextDrawPath(context, kCGPathStroke)
-            drawPoint(CGPoint(x: first.x, y: first.y), withColor: color)
+//            drawPoint(CGPoint(x: first.x, y: first.y), withColor: color)
             drawPoint(CGPoint(x: last.x, y: last.y), withColor: color)
         }
     }
