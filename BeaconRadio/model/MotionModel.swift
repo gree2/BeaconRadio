@@ -81,7 +81,11 @@ class MotionModel: MotionTrackerDelegate {
     
     var latestMotions: [Motion] {
         get {
-            return self.motionStore// + [Motion(heading: self.currentHeading(), distance: 0.0)] // adds current heading => particle moves if motionStore isEmpty
+            if self.motionStore.isEmpty {
+                return [Motion(heading: self.currentHeading(), distance: 0.0)]
+            } else {
+                return self.motionStore
+            }
         }
     }
     
