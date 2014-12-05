@@ -125,7 +125,6 @@ class ParticleFilter: NSObject, Observable, Observer {
     
     private var w_slow = 0.0
     private var w_fast = 0.0
-    private var mcl_callCount = 0
     
     private func mcl(particles_tMinus1: [Particle], map: Map) -> [Particle] {
         
@@ -134,12 +133,6 @@ class ParticleFilter: NSObject, Observable, Observer {
         // motions
         let motions = self.motionModel.latestMotions // get copy of motions
         self.motionModel.resetMotionStore() // delete motions
-        
-        if motions.isEmpty && ++mcl_callCount < 3 {
-            return particles_tMinus1
-        } else {
-            mcl_callCount = 0
-        }
         
         // Sample motion + weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
