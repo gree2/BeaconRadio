@@ -95,10 +95,10 @@ class ParticleMapView: UIView {
         }
     }
     
-    var particleSetMeanSize: Double = 15.0 {
+    var pointSize: Double = 15.0 {
         didSet {
-            if self.particleSetMeanSize > 0 {
-                self.particleSetMeanSize = oldValue
+            if self.pointSize > 0 {
+                self.pointSize = oldValue
             }
         }
     }
@@ -120,15 +120,6 @@ class ParticleMapView: UIView {
                 println("[Warning] ParticleMapView: Particle (\(particle.description())) out of Bounds")
             }
         }
-        
-        // draw particle set mean
-//        if mean.x >= 0 && mean.y >= 0 {
-//            let ctx = UIGraphicsGetCurrentContext()
-//            CGContextSetFillColorWithColor(ctx, UIColor.greenColor().CGColor)
-//            
-//            let circleRect = CGRect(x: mean.x - self.particleSetMeanSize * 0.5, y: mean.y - self.particleSetMeanSize * 0.5, width: self.particleSetMeanSize, height: self.particleSetMeanSize)
-//            CGContextFillEllipseInRect(ctx, circleRect)
-//        }
         
         // draw landmarks
         if !landmarks.isEmpty {
@@ -170,8 +161,6 @@ class ParticleMapView: UIView {
         let head = centerPointOfParticleHead(particle)
         let right = rightPointOfParticleHead(head: head, particle: particle)
         let left = leftPointOfParticleHead(head: head, particle: particle)
-
-        // DEBUG println("Particle angle: \(Angle.unitCircleRad2CompassDeg(particle.theta)) compassDeg (\(particle.theta) rad)")
         
         // drawing code goes here
         let context = UIGraphicsGetCurrentContext()
@@ -243,8 +232,10 @@ class ParticleMapView: UIView {
             CGContextBeginPath(context)
             
             let first = path.first!
+            let last = path.last!
             
             CGContextMoveToPoint(context, CGFloat(first.x), CGFloat(first.y))
+            
             
             for var i = 1; i < path.count; ++i {
                 let p = path[i]
@@ -252,7 +243,22 @@ class ParticleMapView: UIView {
             }
             
             CGContextDrawPath(context, kCGPathStroke)
+            drawPoint(CGPoint(x: first.x, y: first.y), withColor: color)
+            drawPoint(CGPoint(x: last.x, y: last.y), withColor: color)
         }
+    }
+    
+    private func drawPoint(point: CGPoint, withColor color: UIColor) {
+        if point.x >= 0 && point.y >= 0 {
+            let ctx = UIGraphicsGetCurrentContext()
+            CGContextSetFillColorWithColor(ctx, color.CGColor)
+            
+            let pointSize: CGFloat = CGFloat(self.pointSize)
+            
+            let circleRect = CGRect(x: point.x - pointSize * 0.5, y: point.y - pointSize * 0.5, width: pointSize, height: pointSize)
+            CGContextFillEllipseInRect(ctx, circleRect)
+        }
+
     }
     
 }
