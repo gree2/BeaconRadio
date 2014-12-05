@@ -144,7 +144,7 @@ class ParticleMapViewController: UIViewController, Observer, UIScrollViewDelegat
     private func transformParticle(p: Particle, ToMapCS map: Map) -> Particle{
         let x = p.x * Double(map.scale)
         let y = p.y * Double(map.scale)
-        let theta = Angle.compassDeg2UnitCircleRad( Angle.unitCircleRad2CompassDeg(p.theta) - map.mapOrientation )
+        let theta = p.theta // map orientation already integrated in MotionModel
         
         return Particle(x: x, y: y, theta: theta)
     }

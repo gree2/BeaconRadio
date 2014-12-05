@@ -24,6 +24,7 @@ class MotionModel: MotionTrackerDelegate {
     }
     
     private let motionTracker = MotionTrackerFactory.motionTracker
+    private let map: Map
     
     private var latestHeading: (timestamp: NSDate, heading: Double)?
     private var headingStore: [(timestamp: NSDate, heading: Double)] = []
@@ -33,8 +34,8 @@ class MotionModel: MotionTrackerDelegate {
     private var poseStore = [Pose]()
     
     
-    init() {
-        
+    init(map: Map) {
+        self.map = map
     }
     
     func startMotionTracking() {
@@ -132,7 +133,9 @@ class MotionModel: MotionTrackerDelegate {
     // MARK: MotionTrackerDelegate
     func motionTracker(tracker: IMotionTracker, didReceiveHeading heading: Double, withTimestamp ts: NSDate) {
         
-        let tupel: (timestamp: NSDate, heading: Double) = (ts, Angle.compassDeg2UnitCircleRad(heading))
+        let mapBasedHeading: Double = heading - self.map.mapOrientation
+        
+        let tupel: (timestamp: NSDate, heading: Double) = (ts, Angle.compassDeg2UnitCircleRad(mapBasedHeading))
         
         self.headingStore.append(tupel)
     }

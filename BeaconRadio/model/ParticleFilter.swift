@@ -29,7 +29,7 @@ class ParticleFilter: NSObject, Observable, Observer {
     
     private lazy var beaconRadar: IBeaconRadar = BeaconRadarFactory.beaconRadar
     
-    private lazy var motionModel = MotionModel()
+    private var motionModel: MotionModel
     private lazy var measurementModel = MeasurementModel()
     private var _isRunning = false
     var isRunning: Bool {
@@ -66,6 +66,7 @@ class ParticleFilter: NSObject, Observable, Observer {
     
     init(map: Map) {
         self.map = map
+        self.motionModel = MotionModel(map: map)
         super.init()
     }
     
