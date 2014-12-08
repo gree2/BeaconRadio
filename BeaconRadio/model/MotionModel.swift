@@ -32,10 +32,13 @@ class MotionModel: MotionTrackerDelegate {
     private var motionStore = [Motion]()
     
     private var poseStore = [Pose]()
+    private var startPose: Pose
     
     
     init(map: Map) {
         self.map = map
+        self.startPose = Pose(x: 1.93, y: 1.24, theta: 0.0) // x = 0.38 + 0.55 + 1.0 = 1.93, y = 0.04 + 1.2 = 1.24 (Türe VR)
+//        self.startPose = Pose(x: 7.93, y: 1.24, theta: 0.0) // x = 0.38 + 0.55 + 7.0 = 1.93, y = 0.04 + 1.2 = 1.24 (Fenster VL)
     }
     
     func startMotionTracking() {
@@ -44,6 +47,11 @@ class MotionModel: MotionTrackerDelegate {
     
     func stopMotionTracking() {
         self.motionTracker.stopMotionTracking() // TODO: Delete maybe all old data?
+        
+        for p in poseStore {
+            Logger.sharedInstance.log(message: "[MotionPose] x:\(p.x), y: \(p.y)")
+        }
+        Logger.sharedInstance.save2File()
     }
     
     // MARK: Sample Motion Model
@@ -61,7 +69,7 @@ class MotionModel: MotionTrackerDelegate {
                 var h = 0.0
                 
                 for u_t in u {
-                    let sigma_rot = Angle.deg2Rad(10.0) // degree
+                    let sigma_rot = Angle.deg2Rad(20.0) // degree
                     let sigma_trans = 0.0971 * u_t.distance + 1.445 //0.068 * u_t.distance + 2.1559
                     
                     h = u_t.heading - Random.sample_normal_distribution(sigma_rot)
@@ -119,7 +127,7 @@ class MotionModel: MotionTrackerDelegate {
             if let last = self.poseStore.last {
                 return last
             } else {
-                let p = Pose(x: 1.5, y: 2.0, theta: Angle.compassDeg2UnitCircleRad(125.0))
+                let p = self.startPose
                 self.poseStore.append(p)
                 
                 return p
