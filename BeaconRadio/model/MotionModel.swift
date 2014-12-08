@@ -29,6 +29,7 @@ class MotionModel: MotionTrackerDelegate {
     private var latestHeading: (timestamp: NSDate, heading: Double)?
     private var headingStore: [(timestamp: NSDate, heading: Double)] = []
     private var latestDistanceMeasurement: (timestamp: NSDate, distance: Double)?
+    private var motionStore_pf = [Motion]() // particle filter
     private var motionStore = [Motion]()
     
     private var poseStore = [Pose]()
@@ -89,16 +90,16 @@ class MotionModel: MotionTrackerDelegate {
     
     var latestMotions: [Motion] {
         get {
-            if self.motionStore.isEmpty {
+            if self.motionStore_pf.isEmpty {
                 return [Motion(heading: self.currentHeading(), distance: 0.0)]
             } else {
-                return self.motionStore
+                return self.motionStore_pf
             }
         }
     }
     
     func resetMotionStore() {
-        self.motionStore.removeAll(keepCapacity: true)
+        self.motionStore_pf.removeAll(keepCapacity: true)
     }
     
     
@@ -120,6 +121,8 @@ class MotionModel: MotionTrackerDelegate {
         let lastPose = self.lastPoseEstimation
         
         poseStore.append(Pose(x: lastPose.x + xDiff, y: lastPose.y + yDiff, theta: heading))
+        
+        self.motionStore.removeAll(keepCapacity: true)
     }
     
     var lastPoseEstimation: Pose {
@@ -154,11 +157,21 @@ class MotionModel: MotionTrackerDelegate {
     
     func motionTracker(tracker: IMotionTracker, didReceiveDistance d: Double, withStartDate start: NSDate, andEndDate end: NSDate) {
         
+        var motions = [Motion]()
+        
         if let last = self.latestDistanceMeasurement {
-            self.motionStore += computeMotionsByIntegratingHeadingIntoDistance(d - last.distance, forStartTime: last.timestamp, andEndTime: end)
+            
+            if d > last.distance { // same distance ist sometimes sent multiple times with different timestamp
+                motions = computeMotionsByIntegratingHeadingIntoDistance(d - last.distance, forStartTime: last.timestamp, andEndTime: end)
+                resetHeadingStore()
+            }
+            
         } else {
-            self.motionStore += computeMotionsByIntegratingHeadingIntoDistance(d, forStartTime: start, andEndTime: end)
+            motions = computeMotionsByIntegratingHeadingIntoDistance(d, forStartTime: start, andEndTime: end)
         }
+        
+        self.motionStore += motions
+        self.motionStore_pf += motions
         
         self.latestDistanceMeasurement = (end, d)
         computeNewPoseEstimation()
@@ -206,8 +219,6 @@ class MotionModel: MotionTrackerDelegate {
             
             motions.append(computeMotionWithHeading(magneticHeading, distance: distance, headingDuration: headingDuration, totalDuration: totalDuration))
         }
-        
-        resetHeadingStore()
         
         return motions
     }
