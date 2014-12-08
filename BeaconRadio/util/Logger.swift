@@ -23,7 +23,7 @@ class Logger {
     
     private lazy var dateFormatter: NSDateFormatter = {
         let dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "HH:mm:ss"
+        dateFormatter.dateFormat = "YYYY-MM-dd_HH-mm-ss"
         return dateFormatter
     }()
     
@@ -58,7 +58,7 @@ class Logger {
             
             if let directories = dirs {
                 let dir = directories[0]; //documents directory
-                let path = dir.stringByAppendingPathComponent("Log_\(self.dateFormatter.stringFromDate(NSDate())).txt");
+                let path = dir.stringByAppendingPathComponent("\(self.dateFormatter.stringFromDate(NSDate()))_Log.txt");
                 
                 let content:String = self.logBuffer.reduce("", combine: +)
                 self.logBuffer.removeAll(keepCapacity: true)
