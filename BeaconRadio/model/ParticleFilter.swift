@@ -176,8 +176,6 @@ class ParticleFilter: NSObject, Observable, Observer {
         
         var logCount_addedRandomParticleCount = 0
         
-//        if !weightedParticleSet.isEmpty {
-
             while particles_t.count < self.particleSetSize {
                 
                 let p = Random.rand_uniform()
@@ -235,13 +233,9 @@ class ParticleFilter: NSObject, Observable, Observer {
             self.estimatedPath.append(Pose(x: self.weightedParticleSetMean.x, y: self.weightedParticleSetMean.y, theta: 0.0))
             
             println("\(logCount_addedRandomParticleCount) random particles added.")
-            Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
+            //Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
         
             return particles_t
-//        } else {
-//            // can happen if all particles are out of bounds
-//            return generateParticleSet()
-//        }
     }
     
     // MARK: Particle generation
