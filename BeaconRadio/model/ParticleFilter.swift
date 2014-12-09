@@ -192,51 +192,57 @@ class ParticleFilter: NSObject, Observable, Observer {
                     ++logCount_addedRandomParticleCount
                 } else {
                     // draw particle with probability
-                    let random = Random.rand_uniform() * weightedParticleSet.last!.weight
-                    
-                    // loop
-/*                    var index = 0
-                    
-                    for var i: Int = 0; i < weightedParticleSet.count; ++i {
+                    if let last = weightedParticleSet.last {
+                        let random = Random.rand_uniform() * last.weight
+                        
+                        // loop
+                        /*                    var index = 0
+                        
+                        for var i: Int = 0; i < weightedParticleSet.count; ++i {
                         if weightedParticleSet[i].weight < random {
-                            index = i
+                        index = i
                         } else {
-                            break;
+                        break;
                         }
-                    }
-*/
-                    // binary search
-                    var m: Int = 0;
-                    var left: Int = 0;
-                    var right: Int = weightedParticleSet.count-1;
-                    while left <= right {
-                        m = (left + right)/2
-                        if random < weightedParticleSet[m].weight {
-                            right = m - 1
-                        } else if random > weightedParticleSet[m].weight {
-                            left = m + 1
-                        } else {
-                            break
                         }
+                        */
+                        // binary search
+                        var m: Int = 0;
+                        var left: Int = 0;
+                        var right: Int = weightedParticleSet.count-1;
+                        while left <= right {
+                            m = (left + right)/2
+                            if random < weightedParticleSet[m].weight {
+                                right = m - 1
+                            } else if random > weightedParticleSet[m].weight {
+                                left = m + 1
+                            } else {
+                                break
+                            }
+                        }
+                        
+                        // drawn particle
+                        let particle = weightedParticleSet[m].particle
+                        let weight = weightedParticleSet[m].weight
+                        
+                        // calc weighted particleSetMean
+                        weightedParticleSetMean.x += particle.x * weight
+                        weightedParticleSetMean.y += particle.y * weight
+                        weightSum += weight
+                        
+                        // add particle to new set
+                        particles_t.append(particle)
+                    } else {
+                        particles_t += generateParticleSet()
                     }
-                    
-                    // drawn particle
-                    let particle = weightedParticleSet[m].particle
-                    let weight = weightedParticleSet[m].weight
-                    
-                    // calc weighted particleSetMean
-                    weightedParticleSetMean.x += particle.x * weight
-                    weightedParticleSetMean.y += particle.y * weight
-                    weightSum += weight
-                    
-                    // add particle to new set
-                    particles_t.append(particle)
                 }
             }
         
+        if weightSum > 0 {
             self.weightedParticleSetMean = (x: weightedParticleSetMean.x/weightSum, y: weightedParticleSetMean.y/weightSum)
             self.estimatedPath.append(Pose(x: self.weightedParticleSetMean.x, y: self.weightedParticleSetMean.y, theta: 0.0))
-            
+        }
+            println("Particle Weight Sum: \(weightSum)")
             println("\(logCount_addedRandomParticleCount) random particles added.")
             //Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
         
@@ -248,8 +254,8 @@ class ParticleFilter: NSObject, Observable, Observer {
     private func generateParticlesAroundBeacons(beacons: [Beacon]) -> [Particle] {
         
         var particles = [Particle]()
-        
-        for b in beacons {
+        if let b = beacons.first {
+//        for b in beacons {
             if let landmark = self.map.landmarks[b.identifier] {
                 let xMin = max(0.0, landmark.x - (b.accuracy * 0.5))
                 let xMax = min(self.map.size.x, landmark.x + (b.accuracy * 0.5))

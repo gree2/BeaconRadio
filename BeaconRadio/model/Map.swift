@@ -41,21 +41,24 @@ class Map {
     
     func isCellFree(#x: Double, y: Double) -> Bool {
         
-        let pixel = pos2Pixel(x: x, y: y)
-        
-        if 0 <= pixel.x && pixel.x < Int(self.mapImg.size.width) && 0 <= pixel.y && pixel.y < Int(self.mapImg.size.height) {
+        if 0.0 <= x && x < self.size.x && 0.0 <= y && y < self.size.y {
+            let pixel = pos2Pixel(x: x, y: y)
             
-            let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
-            
-            let pixelInfo: Int = ((Int(self.mapImg.size.width) * Int(pixel.y)) + Int(pixel.x)) * 4
-            
-            let r = CGFloat(data[pixelInfo])
-            let g = CGFloat(data[pixelInfo+1])
-            let b = CGFloat(data[pixelInfo+2])
-//            let a = CGFloat(data[pixelInfo+3])
-            
-            return (r == 255.0 && g == 255.0 && b == 255.0)
+            if 0 <= pixel.x && pixel.x < Int(self.mapImg.size.width) && 0 <= pixel.y && pixel.y < Int(self.mapImg.size.height) {
+                
+                let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
+                
+                let pixelInfo: Int = ((Int(self.mapImg.size.width) * Int(pixel.y)) + Int(pixel.x)) * 4
+                
+                let r = CGFloat(data[pixelInfo])
+                let g = CGFloat(data[pixelInfo+1])
+                let b = CGFloat(data[pixelInfo+2])
+                //            let a = CGFloat(data[pixelInfo+3])
+                
+                return (r == 255.0 && g == 255.0 && b == 255.0)
+            }
         }
+        
         return false
     }
     
