@@ -257,7 +257,8 @@ class ParticleFilter: NSObject, Observable, Observer {
                 let yMin = max(0.0, landmark.y - (b.accuracy * 0.5))
                 let yMax = min(self.map.size.y, landmark.y + (b.accuracy * 0.5))
                 
-                let size:Int = Int(ceil(Double(self.particleSetSize) / Double(beacons.count)))
+//                let size:Int = Int(ceil(Double(self.particleSetSize) / Double(beacons.count)))
+                let size = self.particleSetSize
                 
                 particles += generateParticleSetWithSize(size, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax)
             }
