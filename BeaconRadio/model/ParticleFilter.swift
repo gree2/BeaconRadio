@@ -135,6 +135,11 @@ class ParticleFilter: NSObject, Observable, Observer {
         let motions = self.motionModel.latestMotions // get copy of motions
         self.motionModel.resetMotionStore() // delete motions
         
+        // no motion integration and resampling if device is moving but no motion data available
+        if !self.motionModel.isDeviceStationary && motions.count == 1 && motions.first?.distance == 0.0 {
+            return particles_tMinus1
+        }
+        
         // Sample motion + weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
         weightedParticleSet.reserveCapacity(self.particleSetSize)

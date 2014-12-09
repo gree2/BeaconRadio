@@ -36,6 +36,14 @@ class MotionModel: MotionTrackerDelegate {
     private var startPose: Pose
     
     
+    private var _isDeviceStationary: Bool = true
+    var isDeviceStationary: Bool {
+        get {
+            return self._isDeviceStationary
+        }
+    }
+    
+    
     init(map: Map) {
         self.map = map
 //        self.startPose = Pose(x: 1.93, y: 1.24, theta: 0.0) // x = 0.38 + 0.55 + 1.0 = 1.93, y = 0.04 + 1.2 = 1.24 (Türe VR)
@@ -177,6 +185,9 @@ class MotionModel: MotionTrackerDelegate {
         computeNewPoseEstimation()
     }
     
+    func motionTracker(tracker: IMotionTracker, didReceiveMotionActivityData stationary: Bool, withConfidence confidence: CMMotionActivityConfidence, andStartDate start: NSDate) {
+        self._isDeviceStationary = stationary
+    }
     
     // MARK: Motion calculation
     private func computeMotionsByIntegratingHeadingIntoDistance(distance: Double, forStartTime start: NSDate, andEndTime end: NSDate) -> [Motion] {

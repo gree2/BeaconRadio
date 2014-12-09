@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import CoreMotion
 
 class MotionTrackerSimulator: IMotionTracker, DataPlayerDelegate {
 
@@ -15,6 +15,7 @@ class MotionTrackerSimulator: IMotionTracker, DataPlayerDelegate {
     
     private let headingPlayer = DataPlayer()
     private let pedometerPlayer = DataPlayer()
+    private let activityPlayer = DataPlayer()
     // further players currently not beeing used
     
     required init() {
@@ -24,11 +25,13 @@ class MotionTrackerSimulator: IMotionTracker, DataPlayerDelegate {
     func startMotionTracking(delegate: MotionTrackerDelegate) {
         self.delegate = delegate
         
-        self.headingPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-05_16-51_Heading.csv")!, error: nil)
-        self.pedometerPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-05_16-51_Pedometer.csv")!, error: nil)
+        self.headingPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-05_17-00_Heading.csv")!, error: nil)
+        self.pedometerPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-05_17-00_Pedometer.csv")!, error: nil)
+        self.activityPlayer.load(dataStoragePath: Util.pathToLogfileWithName("2014-12-05_17-00_Activity.csv")!, error: nil)
         
         self.headingPlayer.playback(self)
         self.pedometerPlayer.playback(self)
+        self.activityPlayer.playback(self)
     }
     
     func stopMotionTracking() {
@@ -43,6 +46,8 @@ class MotionTrackerSimulator: IMotionTracker, DataPlayerDelegate {
             handleHeadingData(data)
         } else if player === self.pedometerPlayer {
             handlePedometerData(data)
+        } else if player === self.activityPlayer {
+            handleActivityData(data)
         }
     }
     
@@ -69,6 +74,18 @@ class MotionTrackerSimulator: IMotionTracker, DataPlayerDelegate {
             let endDate: NSDate = self.pedometerPlayer.convertRelativeDateToAbsolute(endTimeInterval) // relative timestamp to playerstart
             
             self.delegate?.motionTracker(self, didReceiveDistance: distance, withStartDate: startDate, andEndDate: endDate)
+        }
+    }
+    
+    private func handleActivityData(data: [[String:String]]) {
+        for d in data {
+            let startTimeInterval: Double = NSString(string: d["startDate"]!).doubleValue
+            let startDate: NSDate = self.pedometerPlayer.convertRelativeDateToAbsolute(startTimeInterval) // relative timestamp to playerstart
+            
+            let stationary: Bool = NSString(string: d["stationary"]!).boolValue
+            let confidence: Int = NSString(string: d["confidence"]!).integerValue
+            
+            self.delegate?.motionTracker(self, didReceiveMotionActivityData: stationary, withConfidence: CMMotionActivityConfidence(rawValue: confidence)!, andStartDate: startDate)
         }
     }
 }

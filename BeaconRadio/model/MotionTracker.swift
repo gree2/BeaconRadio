@@ -130,6 +130,8 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
                         // TODO (activity and confidence)
                         //                    Logger.sharedInstance.log(message: activity.description)
                         
+                        self.delegate?.motionTracker(self, didReceiveMotionActivityData: activity.stationary, withConfidence: activity.confidence, andStartDate: activity.startDate)
+                        
                         let relativeTs = self.activityLogger.convertAbsoluteDateToRelativeDate(activity.startDate)
                         
                         let res = self.activityLogger.log([["startDate":"\(relativeTs)", "confidence":"\(activity.confidence.rawValue)", "unknown":"\(activity.unknown)", "stationary":"\(activity.stationary)", "walking":"\(activity.walking)", "running":"\(activity.running)", "automotive":"\(activity.automotive)", "cycling":"\(activity.cycling)"]])
