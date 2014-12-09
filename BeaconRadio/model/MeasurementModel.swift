@@ -65,7 +65,7 @@ class MeasurementModel: Observer {
     }
     
     func resetMeasurementStore() {
-        self.beaconsInRange.removeAll(keepCapacity: true)
+        self.beaconsInRange.removeAll(keepCapacity: false)
     }
     
     // MARK: Observer protocol
