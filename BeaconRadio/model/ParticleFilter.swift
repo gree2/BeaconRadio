@@ -184,9 +184,9 @@ class ParticleFilter: NSObject, Observable, Observer {
             while particles_t.count < self.particleSetSize {
                 
                 let p = Random.rand_uniform()
-                let x = max( 0.0, 1.0 - (w_fast/w_slow))
+                let x = 0.05 //max( 0.0, 1.0 - (w_fast/w_slow))
                 
-                if false { // p < x
+                if p < x {
                     // add random particle
                     particles_t.append(generateRandomParticle())
                     ++logCount_addedRandomParticleCount
