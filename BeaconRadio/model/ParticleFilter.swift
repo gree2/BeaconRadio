@@ -166,11 +166,11 @@ class ParticleFilter: NSObject, Observable, Observer {
         }
         
         let alpha_slow = 0.4
-        let alpha_fast = 0.5
+        let alpha_fast = 0.45
         
         w_slow += alpha_slow * (w_avg - w_slow)
         w_fast += alpha_fast * (w_avg - w_fast)
-        //println("w_avg: \(w_avg), w_slow: \(w_slow), w_fast: \(w_fast), w_fast/w_slow: \(w_fast/w_slow)")
+        println("w_avg: \(w_avg), w_slow: \(w_slow), w_fast: \(w_fast), w_fast/w_slow: \(w_fast/w_slow)")
         
         var weightedParticleSetMean: (x: Double, y: Double) = (0.0, 0.0)
         var weightSum = 0.0
@@ -186,7 +186,7 @@ class ParticleFilter: NSObject, Observable, Observer {
                 let p = Random.rand_uniform()
                 let x = max( 0.0, 1.0 - (w_fast/w_slow))
                 
-                if p < x {
+                if false { // p < x
                     // add random particle
                     particles_t.append(generateRandomParticle())
                     ++logCount_addedRandomParticleCount
@@ -234,6 +234,7 @@ class ParticleFilter: NSObject, Observable, Observer {
                         particles_t.append(particle)
                     } else {
                         particles_t += generateParticleSet()
+                        logCount_addedRandomParticleCount = self.particleSetSize
                     }
                 }
             }
@@ -242,11 +243,13 @@ class ParticleFilter: NSObject, Observable, Observer {
             self.weightedParticleSetMean = (x: weightedParticleSetMean.x/weightSum, y: weightedParticleSetMean.y/weightSum)
             self.estimatedPath.append(Pose(x: self.weightedParticleSetMean.x, y: self.weightedParticleSetMean.y, theta: 0.0))
         }
-            println("Particle Weight Sum: \(weightSum)")
-            println("\(logCount_addedRandomParticleCount) random particles added.")
-            //Logger.sharedInstance.log(message: "AddedRandomParticleCount: \(logCount_addedRandomParticleCount)")
         
-            return particles_t
+        println("Particle Weight Sum: \(weightSum)")
+        println("\(logCount_addedRandomParticleCount) random particles added.")
+        Logger.sharedInstance.log(message: "Particle Weight Sum: \(weightSum)")
+        Logger.sharedInstance.log(message: "Added Random Particle: \(logCount_addedRandomParticleCount)")
+        
+        return particles_t
     }
     
     // MARK: Particle generation

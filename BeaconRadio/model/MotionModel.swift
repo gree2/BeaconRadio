@@ -78,8 +78,14 @@ class MotionModel: MotionTrackerDelegate {
                 var h = 0.0
                 
                 for u_t in u {
-                    let sigma_rot = Angle.deg2Rad(20.0) // degree
-                    let sigma_trans = 0.0971 * u_t.distance + 1.445 //0.068 * u_t.distance + 2.1559
+                    var sigma_rot = Angle.deg2Rad(10.0) // degree
+//                    let sigma_trans = 0.0971 * u_t.distance + 1.445 //0.068 * u_t.distance + 2.1559
+                    var sigma_trans = 0.1 * u_t.distance
+                    
+                    if u_t.distance == 0.0 {
+                        sigma_rot = M_PI
+                        sigma_trans = 0.5
+                    }
                     
                     h = u_t.heading - Random.sample_normal_distribution(sigma_rot)
                     let d = u_t.distance - Random.sample_normal_distribution(sigma_trans)
@@ -186,7 +192,11 @@ class MotionModel: MotionTrackerDelegate {
     }
     
     func motionTracker(tracker: IMotionTracker, didReceiveMotionActivityData stationary: Bool, withConfidence confidence: CMMotionActivityConfidence, andStartDate start: NSDate) {
-        self._isDeviceStationary = stationary
+        if !stationary && confidence.rawValue >= CMMotionActivityConfidence.Low.rawValue {
+            self._isDeviceStationary = false
+        } else {
+            self._isDeviceStationary = true
+        }
     }
     
     // MARK: Motion calculation
