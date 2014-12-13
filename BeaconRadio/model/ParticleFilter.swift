@@ -26,6 +26,7 @@ class ParticleFilter: NSObject, Observable, Observer {
             notifyObservers()
         }
     }
+    private let desiredParticleDiversity = 0.20 // in %
     
     private lazy var beaconRadar: IBeaconRadar = BeaconRadarFactory.beaconRadar
     
@@ -108,7 +109,7 @@ class ParticleFilter: NSObject, Observable, Observer {
         
         self.operationQueue.addOperationWithBlock({
             
-            let startTime = NSDate()
+//            let startTime = NSDate()
             
             // Distance measurements to Beacons
             var z_reverse = self.measurementModel.measurements.reverse()
@@ -177,8 +178,6 @@ class ParticleFilter: NSObject, Observable, Observer {
             
             // if device is Stationary => integrate sensor values, if not return them to measurement model
             if deviceStationary.stationary {
-              
-                println("z.count(\(z_reverse.count))")
                 
                 while !z_reverse.isEmpty {
                     
@@ -186,9 +185,7 @@ class ParticleFilter: NSObject, Observable, Observer {
                     
 //                    if z_k.timestamp.compare(deviceStationary.timestamp) != NSComparisonResult.OrderedAscending {
                         // stationary.timestamp <= z_k.timestamp
-                        
-                        println("z_k integrated")
-                        
+                    
                         particlesT = self.integrateMotion(self.motionModel.stationaryMotion, intoParticleSet: particlesT)
                         particlesT = self.filter(particlesT, andMeasurements: z_k)
 //                    }
@@ -202,8 +199,8 @@ class ParticleFilter: NSObject, Observable, Observer {
             
             
 
-            let endTime = NSDate().timeIntervalSinceDate(startTime)
-            println("ParticleFilter Duration: \(endTime)")
+//            let endTime = NSDate().timeIntervalSinceDate(startTime)
+//            println("ParticleFilter Duration: \(endTime)")
             
             // MainThread: set particles and notify Observers
             let updateOp = NSBlockOperation(block: {
@@ -220,13 +217,8 @@ class ParticleFilter: NSObject, Observable, Observer {
         return particles.map({p in MotionModel.sampleParticlePoseForPose(p, withMotion: u, andMap: self.map)})
     }
     
-    private var w_slow = 0.0
-    private var w_fast = 0.0
-    
     private func filter(particles_tMinus1: [Particle], andMeasurements z: MeasurementModel.Measurement) -> [Particle] {
-        
-        var w_avg: Double = 0.0
-        
+
         // Sample motion + weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
         weightedParticleSet.reserveCapacity(self.particleSetSize)
@@ -235,9 +227,6 @@ class ParticleFilter: NSObject, Observable, Observer {
             
             var w: Double = MeasurementModel.weightParticle(particle, withDistanceMeasurements: z.z, andMap: self.map)
             if w > 0 {
-                
-                w_avg += (1.0 / Double(self.particleSetSize)) * w
-                
                 // commute weights
                 if weightedParticleSet.count > 1 {
                     w += weightedParticleSet.last!.0 // add weigt of predecessor
@@ -246,13 +235,12 @@ class ParticleFilter: NSObject, Observable, Observer {
             }
         }
         
-        let alpha_slow = 0.4
-        let alpha_fast = 0.45
-        
-        w_slow += alpha_slow * (w_avg - w_slow)
-        w_fast += alpha_fast * (w_avg - w_fast)
-        println("w_avg: \(w_avg), w_slow: \(w_slow), w_fast: \(w_fast), w_fast/w_slow: \(w_fast/w_slow)")
-        
+
+        // Histogram to measure particle diversity
+        var particleHistogram = [Int](count: weightedParticleSet.count, repeatedValue: 0)
+        var differentParticleCount = 0
+
+        // Particle set mean
         var weightedParticleSetMean: (x: Double, y: Double) = (0.0, 0.0)
         var weightSum = 0.0
         
@@ -260,18 +248,19 @@ class ParticleFilter: NSObject, Observable, Observer {
         var particles_t: [Particle] = []
         particles_t.reserveCapacity(weightedParticleSet.count)
         
+        
         var logCount_addedRandomParticleCount = 0
         
         while particles_t.count < self.particleSetSize {
+
+            let particleDiversity: Double = Double(differentParticleCount) / Double(particleHistogram.count)
             
-            let p = Random.rand_uniform()
-            let x = 0.05 //max( 0.0, 1.0 - (w_fast/w_slow))
+            // spezifies until which count particles can be drawn without checking the diversity
+            let insertLevel =  (self.particleSetSize - Int(Double(self.particleSetSize) * self.desiredParticleDiversity))
             
-            if p < x {
-                // add random particle
-                particles_t.append(generateRandomParticle())
-                ++logCount_addedRandomParticleCount
-            } else {
+            
+            if particleDiversity >= self.desiredParticleDiversity || particles_t.count < insertLevel {
+            
                 // draw particle with probability
                 if let last = weightedParticleSet.last {
                     let random = Random.rand_uniform() * last.weight
@@ -295,17 +284,28 @@ class ParticleFilter: NSObject, Observable, Observer {
                     let particle = weightedParticleSet[m].particle
                     let weight = weightedParticleSet[m].weight
                     
+                    // add particle to new set
+                    particles_t.append(particle)
+                    
+                    particleHistogram[m] += 1
+                    if particleHistogram[m] == 1 {
+                        ++differentParticleCount
+                    }
+                    
                     // calc weighted particleSetMean
                     weightedParticleSetMean.x += particle.x * weight
                     weightedParticleSetMean.y += particle.y * weight
                     weightSum += weight
-                    
-                    // add particle to new set
-                    particles_t.append(particle)
-                } else {
-                    particles_t += generateParticleSet()
-                    logCount_addedRandomParticleCount = self.particleSetSize
+
                 }
+                
+            } else {
+                // insert random particle
+                particles_t.append(generateRandomParticle())
+                
+                particleHistogram.append(1)
+                ++differentParticleCount
+                ++logCount_addedRandomParticleCount
             }
         }
         
@@ -314,10 +314,10 @@ class ParticleFilter: NSObject, Observable, Observer {
             self.estimatedPath.append(Pose(x: self.weightedParticleSetMean.x, y: self.weightedParticleSetMean.y, theta: 0.0))
         }
         
-        println("Particle Weight Sum: \(weightSum)")
-        println("\(logCount_addedRandomParticleCount) random particles added.")
-        Logger.sharedInstance.log(message: "Particle Weight Sum: \(weightSum)")
-        Logger.sharedInstance.log(message: "Added Random Particle: \(logCount_addedRandomParticleCount)")
+        let logStmt = "ParticleDiversity: \(Double(differentParticleCount) / Double(particleHistogram.count)) (\(logCount_addedRandomParticleCount) random particles), ParticleWeightSum: \(weightSum)"
+        
+        println(logStmt)
+        Logger.sharedInstance.log(message: logStmt)
         
         return particles_t
     }
