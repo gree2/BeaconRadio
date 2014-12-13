@@ -11,10 +11,12 @@ import Foundation
 
 class MeasurementModel: Observer {
     
-    private var beaconsInRange: [String: Double] = [:]
+    typealias Measurement = (timestamp: NSDate, z: [String:Double])
+    
+    private var beaconsInRange: [Measurement] = []
 
     
-    var measurements: [String: Double] {
+    var measurements: [Measurement] {
         get {
             return self.beaconsInRange
         }
@@ -32,6 +34,33 @@ class MeasurementModel: Observer {
         BeaconRadarFactory.beaconRadar.removeObserver(self)
     }
     
+    func resetMeasurementStore() {
+        self.beaconsInRange.removeAll(keepCapacity: false)
+    }
+    
+    func returnResidualMeasurements(z: [Measurement]) {
+        self.beaconsInRange = (self.beaconsInRange + z).sorted({$0.timestamp.compare($1.timestamp) == NSComparisonResult.OrderedAscending})
+    }
+    
+    // MARK: Observer protocol
+    func update() {
+//        var rangedBeacons = self.beaconsInRange // copies dict
+
+        var z: Measurement = (timestamp: NSDate(), z: [String:Double]())
+        
+        for beacon in BeaconRadarFactory.beaconRadar.getBeacons() {
+            if (beacon.accuracy >= 0) {
+                
+                let id = "\(beacon.proximityUUID.UUIDString):\(beacon.major):\(beacon.minor)"
+
+                z.z[id] = beacon.accuracy
+            }
+        }
+        self.beaconsInRange.append(z)
+    }
+    
+    
+    //MARK: Particle weighting
     class func weightParticle(particle: Particle, withDistanceMeasurements beaconsInRange: [String: Double],  andMap map: Map) -> Double {
         var weight = 0.0
         
@@ -45,9 +74,9 @@ class MeasurementModel: Observer {
                     let diffY = lm.y - particle.y
                     
                     let d = sqrt( (diffX * diffX) + (diffY * diffY) )
-//                    let sigma_d = max(0.3131 * d + 0.0051, 0.5) // standard deviation
+                    //                    let sigma_d = max(0.3131 * d + 0.0051, 0.5) // standard deviation
                     let sigma_d = 0.1 * d // standard deviation
-//                    let sigma_d_2 = pow(sigma_d, 2) // variance
+                    //                    let sigma_d_2 = pow(sigma_d, 2) // variance
                     
                     let d_measurment = beaconsInRange[bID]!
                     
@@ -55,7 +84,7 @@ class MeasurementModel: Observer {
                     
                     weight *= w
                     
-//                    println("LM: \(bID) -> Distance: \(d), measuredDistance: \(self.beaconsInRange[bID]!), weight: \(w)")
+                    //                    println("LM: \(bID) -> Distance: \(d), measuredDistance: \(self.beaconsInRange[bID]!), weight: \(w)")
                 }
             }
         }
@@ -63,24 +92,5 @@ class MeasurementModel: Observer {
         
         
         return weight
-    }
-    
-    func resetMeasurementStore() {
-        self.beaconsInRange.removeAll(keepCapacity: false)
-    }
-    
-    // MARK: Observer protocol
-    func update() {
-        var rangedBeacons: [String: Double] = [:]
-        
-        for beacon in BeaconRadarFactory.beaconRadar.getBeacons() {
-            if (beacon.accuracy >= 0) {
-                
-                let id = "\(beacon.proximityUUID.UUIDString):\(beacon.major):\(beacon.minor)"
-                
-                rangedBeacons.updateValue(beacon.accuracy, forKey: id)
-            }
-        }
-        self.beaconsInRange = rangedBeacons
     }
 }

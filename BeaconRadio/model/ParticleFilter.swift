@@ -85,7 +85,7 @@ class ParticleFilter: NSObject, Observable, Observer {
     
     private func startTimer() {
         // setup NSTimer
-        runFilterTimer = NSTimer(timeInterval: runFilterTimeInterval, target: self, selector: "filter", userInfo: nil, repeats: false)
+        runFilterTimer = NSTimer(timeInterval: runFilterTimeInterval, target: self, selector: "mcl", userInfo: nil, repeats: false)
         NSRunLoop.mainRunLoop().addTimer(runFilterTimer!, forMode: NSRunLoopCommonModes)
     }
     
@@ -100,59 +100,140 @@ class ParticleFilter: NSObject, Observable, Observer {
         self.measurementModel.stopBeaconRanging()
     }
     
-    func filter() {
+    
+    // MARK: Particle Filter algorithm
+    func mcl() {
+        
+        var particlesT = self.particles // copies particleset
         
         self.operationQueue.addOperationWithBlock({
             
-            let particlesT0 = self.particles // copies particleset
             let startTime = NSDate()
             
-            let particlesT1 = self.mcl(particlesT0, map: self.map)
+            // Distance measurements to Beacons
+            var z_reverse = self.measurementModel.measurements.reverse()
+            self.measurementModel.resetMeasurementStore()
+            
+            // motions
+            var u_reverse = self.motionModel.latestMotions.reverse()
+            self.motionModel.resetMotionStore()
+            
+
+            while !u_reverse.isEmpty && !z_reverse.isEmpty {
+                
+                let u_k: MotionModel.Motion = u_reverse.last!
+                let z_k: MeasurementModel.Measurement = z_reverse.last!
+                
+                let compResult = u_k.endDate.compare(z_k.timestamp)
+                
+                if compResult == NSComparisonResult.OrderedAscending {
+                    
+                    // u_k.end <= z_k.timestamp => add to list
+                    particlesT = self.integrateMotion(u_k, intoParticleSet: particlesT)
+                    u_reverse.removeLast()
+                    
+                } else if compResult == NSComparisonResult.OrderedSame {
+                  
+                    particlesT = self.integrateMotion(u_k, intoParticleSet: particlesT)
+                    u_reverse.removeLast()
+                    // filter
+                    particlesT = self.filter(particlesT, andMeasurements: z_k)
+                    z_reverse.removeLast()
+                    
+                } else if u_k.startDate.compare(z_k.timestamp) == NSComparisonResult.OrderedAscending && z_k.timestamp.compare(u_k.endDate) != NSComparisonResult.OrderedDescending {
+                    
+                    // u_k.start < z_k.timestamp && z_k.timestamp < u_k.end => split up u_k
+                    let motionDuration: NSTimeInterval = u_k.endDate.timeIntervalSinceDate(u_k.startDate)
+                    let durationUntilZ: NSTimeInterval = z_k.timestamp.timeIntervalSinceDate(u_k.startDate)
+                    
+                    // create submotion
+                    let d = u_k.distance * durationUntilZ/motionDuration
+                    let subMotion1 = MotionModel.Motion(heading: u_k.heading, distance: d, startDate: u_k.startDate, endDate: z_k.timestamp)
+                    let subMotion2 = MotionModel.Motion(heading: u_k.heading, distance: u_k.distance - d, startDate: z_k.timestamp, endDate: u_k.endDate)
+                    
+                    // integrate submotion 1 and filter
+                    particlesT = self.integrateMotion(subMotion1, intoParticleSet: particlesT)
+                    u_reverse.removeLast()
+                    
+                    // add submotion 2 to
+                    u_reverse.append(subMotion2)
+                    
+                    // filter
+                    particlesT = self.filter(particlesT, andMeasurements: z_k)
+                    z_reverse.removeLast()
+                } else {
+                    particlesT = self.filter(particlesT, andMeasurements: z_k)
+                    z_reverse.removeLast()
+                }
+            }
+
+            
+            if !u_reverse.isEmpty { // just executed if u_reverse is empty or z_reverse
+                // return residual values to motion model
+                self.motionModel.returnResidualMotions(u_reverse)
+            }
+            
+            let deviceStationary = self.motionModel.isDeviceStationary
+            
+            // if device is Stationary => integrate sensor values, if not return them to measurement model
+            if deviceStationary.stationary {
+              
+                println("z.count(\(z_reverse.count))")
+                
+                while !z_reverse.isEmpty {
+                    
+                    let z_k = z_reverse.last!
+                    
+//                    if z_k.timestamp.compare(deviceStationary.timestamp) != NSComparisonResult.OrderedAscending {
+                        // stationary.timestamp <= z_k.timestamp
+                        
+                        println("z_k integrated")
+                        
+                        particlesT = self.integrateMotion(self.motionModel.stationaryMotion, intoParticleSet: particlesT)
+                        particlesT = self.filter(particlesT, andMeasurements: z_k)
+//                    }
+                    z_reverse.removeLast()
+                }
+                
+            } else {
+                // return residual values to measurement model
+                self.measurementModel.returnResidualMeasurements(z_reverse)
+            }
+            
+            
 
             let endTime = NSDate().timeIntervalSinceDate(startTime)
-            //println("ParticleFilter Duration: \(endTime)")
+            println("ParticleFilter Duration: \(endTime)")
             
             // MainThread: set particles and notify Observers
             let updateOp = NSBlockOperation(block: {
                 self.startTimer()
-                self.particleSet = particlesT1 // -> notifyObservers
+                self.particleSet = particlesT // -> notifyObservers
             })
             NSOperationQueue.mainQueue().addOperation(updateOp)
             
         })
     }
     
-    // MARK: MCL algorithm
+    private func integrateMotion(u: MotionModel.Motion, intoParticleSet particles: [Particle]) -> [Particle] {
+        
+        return particles.map({p in MotionModel.sampleParticlePoseForPose(p, withMotion: u, andMap: self.map)})
+    }
     
     private var w_slow = 0.0
     private var w_fast = 0.0
     
-    private func mcl(particles_tMinus1: [Particle], map: Map) -> [Particle] {
+    private func filter(particles_tMinus1: [Particle], andMeasurements z: MeasurementModel.Measurement) -> [Particle] {
         
         var w_avg: Double = 0.0
-        
-        // motions
-        let motions = self.motionModel.latestMotions // get copy of motions
-        self.motionModel.resetMotionStore() // delete motions
-        
-        // no motion integration and resampling if device is moving but no motion data available
-        if !self.motionModel.isDeviceStationary && motions.count == 1 && motions.first?.distance == 0.0 {
-            return particles_tMinus1
-        }
         
         // Sample motion + weight particles
         var weightedParticleSet: [(weight: Double,particle: Particle)] = []
         weightedParticleSet.reserveCapacity(self.particleSetSize)
         
-        // Distance measurements to Beacons
-        let measurements = self.measurementModel.measurements
-        self.measurementModel.resetMeasurementStore()
-        
         for particle in particles_tMinus1 {
             
-            let sampleParticle = MotionModel.sampleParticlePoseForPose(particle, withMotions: motions, andMap: map)
-            
-            var w: Double = MeasurementModel.weightParticle(sampleParticle, withDistanceMeasurements: measurements, andMap: self.map)
+            var w: Double = MeasurementModel.weightParticle(particle, withDistanceMeasurements: z.z, andMap: self.map)
             if w > 0 {
                 
                 w_avg += (1.0 / Double(self.particleSetSize)) * w
@@ -161,7 +242,7 @@ class ParticleFilter: NSObject, Observable, Observer {
                 if weightedParticleSet.count > 1 {
                     w += weightedParticleSet.last!.0 // add weigt of predecessor
                 }
-                weightedParticleSet += [(weight: w, particle: sampleParticle)]
+                weightedParticleSet += [(weight: w, particle: particle)]
             }
         }
         
@@ -181,63 +262,52 @@ class ParticleFilter: NSObject, Observable, Observer {
         
         var logCount_addedRandomParticleCount = 0
         
-            while particles_t.count < self.particleSetSize {
-                
-                let p = Random.rand_uniform()
-                let x = 0.05 //max( 0.0, 1.0 - (w_fast/w_slow))
-                
-                if p < x {
-                    // add random particle
-                    particles_t.append(generateRandomParticle())
-                    ++logCount_addedRandomParticleCount
-                } else {
-                    // draw particle with probability
-                    if let last = weightedParticleSet.last {
-                        let random = Random.rand_uniform() * last.weight
-                        
-                        // loop
-                        /*                    var index = 0
-                        
-                        for var i: Int = 0; i < weightedParticleSet.count; ++i {
-                        if weightedParticleSet[i].weight < random {
-                        index = i
+        while particles_t.count < self.particleSetSize {
+            
+            let p = Random.rand_uniform()
+            let x = 0.05 //max( 0.0, 1.0 - (w_fast/w_slow))
+            
+            if p < x {
+                // add random particle
+                particles_t.append(generateRandomParticle())
+                ++logCount_addedRandomParticleCount
+            } else {
+                // draw particle with probability
+                if let last = weightedParticleSet.last {
+                    let random = Random.rand_uniform() * last.weight
+                    
+                    // binary search
+                    var m: Int = 0;
+                    var left: Int = 0;
+                    var right: Int = weightedParticleSet.count-1;
+                    while left <= right {
+                        m = (left + right)/2
+                        if random < weightedParticleSet[m].weight {
+                            right = m - 1
+                        } else if random > weightedParticleSet[m].weight {
+                            left = m + 1
                         } else {
-                        break;
+                            break
                         }
-                        }
-                        */
-                        // binary search
-                        var m: Int = 0;
-                        var left: Int = 0;
-                        var right: Int = weightedParticleSet.count-1;
-                        while left <= right {
-                            m = (left + right)/2
-                            if random < weightedParticleSet[m].weight {
-                                right = m - 1
-                            } else if random > weightedParticleSet[m].weight {
-                                left = m + 1
-                            } else {
-                                break
-                            }
-                        }
-                        
-                        // drawn particle
-                        let particle = weightedParticleSet[m].particle
-                        let weight = weightedParticleSet[m].weight
-                        
-                        // calc weighted particleSetMean
-                        weightedParticleSetMean.x += particle.x * weight
-                        weightedParticleSetMean.y += particle.y * weight
-                        weightSum += weight
-                        
-                        // add particle to new set
-                        particles_t.append(particle)
-                    } else {
-                        particles_t += generateParticleSet()
-                        logCount_addedRandomParticleCount = self.particleSetSize
                     }
+                    
+                    // drawn particle
+                    let particle = weightedParticleSet[m].particle
+                    let weight = weightedParticleSet[m].weight
+                    
+                    // calc weighted particleSetMean
+                    weightedParticleSetMean.x += particle.x * weight
+                    weightedParticleSetMean.y += particle.y * weight
+                    weightSum += weight
+                    
+                    // add particle to new set
+                    particles_t.append(particle)
+                } else {
+                    particles_t += generateParticleSet()
+                    logCount_addedRandomParticleCount = self.particleSetSize
                 }
             }
+        }
         
         if weightSum > 0 {
             self.weightedParticleSetMean = (x: weightedParticleSetMean.x/weightSum, y: weightedParticleSetMean.y/weightSum)
@@ -251,6 +321,7 @@ class ParticleFilter: NSObject, Observable, Observer {
         
         return particles_t
     }
+    
     
     // MARK: Particle generation
     
@@ -316,7 +387,9 @@ class ParticleFilter: NSObject, Observable, Observer {
         return Particle(x: x, y: y, theta: theta)
     }
     
+    
     // MARK: Observer protocol - BeaconRadio
+    
     func update() {
         // get Beacons ordered by accuracy ascending
         
@@ -333,7 +406,9 @@ class ParticleFilter: NSObject, Observable, Observer {
         startTimer()
     }
     
+    
     // MARK: Observable protocol
+    
     private var observers = NSMutableSet()
     
     func addObserver(o: Observer) {
