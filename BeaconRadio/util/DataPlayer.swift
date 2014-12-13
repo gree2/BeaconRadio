@@ -88,7 +88,11 @@ class DataPlayer {
     }
     
     func convertRelativeDateToAbsolute(relative: NSTimeInterval) -> NSDate {
-        return self.startDate!.dateByAddingTimeInterval(relative)
+        if relative <= 0.0 {
+            return self.startDate!
+        } else {
+            return self.startDate!.dateByAddingTimeInterval(relative)
+        }
     }
     
 }
