@@ -33,7 +33,7 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
     private let headingLogger = DataLogger(attributeNames: ["ts", "magneticHeading"])
     private let pedometerLogger = DataLogger(attributeNames: ["startTime", "endTime", "distance", "steps"])
     private let stepCounterLogger = DataLogger(attributeNames: ["ts", "steps"])
-    private let deviceMotionLogger = DataLogger(attributeNames: ["ts", "roll", "pitch", "yaw"])
+    private let deviceMotionLogger = DataLogger(attributeNames: ["ts", "m11", "m12", "m13", "m21", "m22", "m23", "m31", "m32", "m33"])
     private let activityLogger = DataLogger(attributeNames: ["startDate", "confidence", "unknown", "stationary", "walking", "running", "automotive", "cycling"])
     
     // Date Formatter
@@ -57,11 +57,18 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
             println("[ERROR] CMMotionActivityManager: MotionActivity NOT available.")
         }
         
-        self.deviceMotion.deviceMotionUpdateInterval = 1.0
+        if UInt32(CMMotionManager.availableAttitudeReferenceFrames()) & CMAttitudeReferenceFrameXMagneticNorthZVertical.value == 0 {
+            println("[ERROR] CMMotionAttitudeReferenceFrameXMagneticNorthZVertical NOT available.")
+        }
+        
+        // CMDeviceMotion
+        self.deviceMotion.showsDeviceMovementDisplay = true
+        self.deviceMotion.deviceMotionUpdateInterval = 0.25
+        
         
         // CLLocationManager authorization request
         self.locationManager.delegate = self
-        self.locationManager.headingFilter = 5.0
+        self.locationManager.headingFilter = 2.5
         
         if CLLocationManager.authorizationStatus() == CLAuthorizationStatus.Restricted ||
             CLLocationManager.authorizationStatus() == CLAuthorizationStatus.Denied {
@@ -127,8 +134,6 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
                 
                 if CMMotionActivityManager.isActivityAvailable() {
                     self.motionactivity.startActivityUpdatesToQueue(operationQueue, withHandler: {activity in
-                        // TODO (activity and confidence)
-                        //                    Logger.sharedInstance.log(message: activity.description)
                         
                         self.delegate?.motionTracker(self, didReceiveMotionActivityData: activity.stationary, withConfidence: activity.confidence, andStartDate: activity.startDate)
                         
@@ -137,16 +142,36 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
                         let res = self.activityLogger.log([["startDate":"\(relativeTs)", "confidence":"\(activity.confidence.rawValue)", "unknown":"\(activity.unknown)", "stationary":"\(activity.stationary)", "walking":"\(activity.walking)", "running":"\(activity.running)", "automotive":"\(activity.automotive)", "cycling":"\(activity.cycling)"]])
                     })
                 }
-                
-                self.deviceMotion.startDeviceMotionUpdatesToQueue(operationQueue, withHandler: {motion, error in
-                    if error != nil {
-                        println("[ERROR] CMDeviceMotion: \(error.description)")
-                    } else {
-                        // TODO use attitude instead of heading.
-                        self.deviceMotionLogger.log([["ts":"\(motion.timestamp)", "roll":"\(motion.attitude.roll)", "pitch":"\(motion.attitude.pitch)", "yaw":"\(motion.attitude.yaw)"]])
-                    }
-                    
-                })
+                if UInt32(CMMotionManager.availableAttitudeReferenceFrames()) & CMAttitudeReferenceFrameXMagneticNorthZVertical.value > 0 {
+                    self.deviceMotion.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrameXMagneticNorthZVertical, toQueue: operationQueue, withHandler: {motion, error in
+                        if error != nil {
+                            println("[ERROR] CMDeviceMotion: \(error.description)")
+                        } else if motion != nil {
+                            
+                            // http://stackoverflow.com/questions/9341223/how-can-i-get-the-heading-of-the-device-with-cmdevicemotion-in-ios-5/11299471#11299471
+                            
+                            let rMatrix = motion.attitude.rotationMatrix
+                            
+                            let timestamp = NSDate()
+                            
+                            if rMatrix.m22 != 0 && rMatrix.m12 != 0 {
+                                let heading = (M_PI + atan2(rMatrix.m22, rMatrix.m12)) * 180.0 / M_PI // in compass deg
+                                
+                                //let heading = (motion.attitude.yaw + M_PI) % (2 * M_PI) // yaw: -PI/2 = North, PI = East, PI/2 = South, 0 = West
+                                
+                                self.delegate?.motionTracker(self, didReceiveHeading: heading, withTimestamp: timestamp)
+                                Logger.sharedInstance.log(message: "Heading (CM): \(heading) deg")
+                            }
+                            
+                            let relativeTs = self.headingLogger.convertAbsoluteDateToRelativeDate(timestamp)
+                            self.deviceMotionLogger.log([["ts":"\(relativeTs)",
+                                "m11":"\(rMatrix.m11)", "m12":"\(rMatrix.m12)", "m13":"\(rMatrix.m13)",
+                                "m21":"\(rMatrix.m21)", "m22":"\(rMatrix.m22)", "m23":"\(rMatrix.m23)",
+                                "m31":"\(rMatrix.m31)", "m32":"\(rMatrix.m32)", "m33":"\(rMatrix.m33)"]])
+                        }
+                        
+                    })
+                }
                 self.isTracking = true
         }
     }
@@ -160,7 +185,7 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
     
     func locationManager(manager: CLLocationManager!, didUpdateHeading newHeading: CLHeading!) {
         
-        self.delegate?.motionTracker(self, didReceiveHeading: newHeading.magneticHeading, withTimestamp: newHeading.timestamp)
+//        self.delegate?.motionTracker(self, didReceiveHeading: newHeading.magneticHeading, withTimestamp: newHeading.timestamp)
         
         self.operationQueue.addOperationWithBlock({
             
@@ -170,9 +195,9 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
         })
     }
     
-    func locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager!) -> Bool {
-        return true
-    }
+//    func locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager!) -> Bool {
+//        return true
+//    }
     
     func stopMotionTracking() {
         if isTracking {
@@ -180,6 +205,7 @@ class MotionTracker: NSObject, IMotionTracker, CLLocationManagerDelegate {
             self.stepcounter.stopStepCountingUpdates()
             self.motionactivity.stopActivityUpdates()
             self.locationManager.stopUpdatingHeading()
+            self.deviceMotion.stopDeviceMotionUpdates()
             
             let dirs : [String]? = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true) as? [String]
             

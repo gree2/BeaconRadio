@@ -259,7 +259,7 @@ class ParticleFilter: NSObject, Observable, Observer {
             let insertLevel =  (self.particleSetSize - Int(Double(self.particleSetSize) * self.desiredParticleDiversity))
             
             
-            if particleDiversity >= self.desiredParticleDiversity || particles_t.count < insertLevel {
+            if weightedParticleSet.count > 0 && (particleDiversity >= self.desiredParticleDiversity || particles_t.count < insertLevel) {
             
                 // draw particle with probability
                 if let last = weightedParticleSet.last {
@@ -326,21 +326,31 @@ class ParticleFilter: NSObject, Observable, Observer {
     // MARK: Particle generation
     
     private func generateParticlesAroundBeacons(beacons: [Beacon]) -> [Particle] {
-        
         var particles = [Particle]()
-        if let b = beacons.first {
-//        for b in beacons {
+        
+        for b in beacons {
             if let landmark = self.map.landmarks[b.identifier] {
-                let xMin = max(0.0, landmark.x - (b.accuracy * 0.5))
-                let xMax = min(self.map.size.x, landmark.x + (b.accuracy * 0.5))
                 
-                let yMin = max(0.0, landmark.y - (b.accuracy * 0.5))
-                let yMax = min(self.map.size.y, landmark.y + (b.accuracy * 0.5))
+                let size:Int = Int(ceil(Double(self.particleSetSize) / Double(beacons.count)))
+                var addedParticles = 0
                 
-//                let size:Int = Int(ceil(Double(self.particleSetSize) / Double(beacons.count)))
-                let size = self.particleSetSize
+                while addedParticles < size {
+                    let theta = Random.rand_uniform(2 * M_PI)
+                    let d = Random.sample_normal_distribution(0.2 * b.accuracy)
+                    
+                    let deltaX = cos(theta) * (b.accuracy + d)
+                    let deltaY = sin(theta) * (b.accuracy + d)
+                    
+                    let x = landmark.x + deltaX
+                    let y = landmark.y + deltaY
+                    
+                    if map.isCellFree(x: x, y: y) {
+                        particles.append(Particle(x: x, y: y, theta: Random.rand_uniform(2 * M_PI))) // different end orientation
+                        ++addedParticles
+                    }
+                }
                 
-                particles += generateParticleSetWithSize(size, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax)
+                
             }
         }
         return particles

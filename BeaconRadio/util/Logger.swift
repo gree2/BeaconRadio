@@ -29,7 +29,7 @@ class Logger {
     
     private lazy var logBuffer:[String] = {
         var a:[String] = []
-        a.reserveCapacity(50)
+        a.reserveCapacity(500)
         return a
     }()
     

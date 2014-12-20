@@ -27,6 +27,7 @@
 		E04F6B681A08E5A100C7F78E /* ParticleFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04F6B671A08E5A100C7F78E /* ParticleFilter.swift */; };
 		E05551CC1A1365C90073EFAC /* Angle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05551CB1A1365C90073EFAC /* Angle.swift */; };
 		E05551CE1A13802C0073EFAC /* Pose.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05551CD1A13802C0073EFAC /* Pose.swift */; };
+		E0754E351A443E75005EA7F2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0754E341A443E75005EA7F2 /* Settings.swift */; };
 		E09460F81A00D0F70026E002 /* StepCounterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460F71A00D0F70026E002 /* StepCounterViewController.swift */; };
 		E09460FA1A0261280026E002 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460F91A0261280026E002 /* Map.swift */; };
 		E09460FC1A0261380026E002 /* MapsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09460FB1A0261380026E002 /* MapsManager.swift */; };
@@ -109,6 +110,7 @@
 		E04F6B671A08E5A100C7F78E /* ParticleFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticleFilter.swift; sourceTree = "<group>"; };
 		E05551CB1A1365C90073EFAC /* Angle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Angle.swift; sourceTree = "<group>"; };
 		E05551CD1A13802C0073EFAC /* Pose.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pose.swift; sourceTree = "<group>"; };
+		E0754E341A443E75005EA7F2 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		E09460F71A00D0F70026E002 /* StepCounterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StepCounterViewController.swift; sourceTree = "<group>"; };
 		E09460F91A0261280026E002 /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		E09460FB1A0261380026E002 /* MapsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapsManager.swift; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 				E0E8A9641A123141003FC9EE /* Random.swift */,
 				E09460FD1A02850F0026E002 /* UIImage.swift */,
 				E0E09D111A236E10008DBAA1 /* Util.swift */,
+				E0754E341A443E75005EA7F2 /* Settings.swift */,
 			);
 			path = util;
 			sourceTree = "<group>";
@@ -426,6 +429,7 @@
 				E0E09D0A1A1F32AF008DBAA1 /* DataPlayer.swift in Sources */,
 				E04F6B681A08E5A100C7F78E /* ParticleFilter.swift in Sources */,
 				E09461081A03FAAA0026E002 /* Particle.swift in Sources */,
+				E0754E351A443E75005EA7F2 /* Settings.swift in Sources */,
 				E09460F81A00D0F70026E002 /* StepCounterViewController.swift in Sources */,
 				E040633E19E549ED00C0A3D0 /* BeaconLogManager.swift in Sources */,
 				E040634119E549ED00C0A3D0 /* Observer.swift in Sources */,
